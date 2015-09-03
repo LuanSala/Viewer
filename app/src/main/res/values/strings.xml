@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">3D CloudPoints</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="new_file">New File</string>
+
+    <string name="nav_drawer_TAG">nav_drawer_TAG</string>
+
+    <string name="key_mode_vision">key_mode_vision</string>
+    <string name="key_mov_speed">key_mov_speed</string>
+    <string name="key_center_trackball">key_center_trackball</string>
+    <string name="key_full_screen">key_full_screen</string>
+
+    <string name="value_mode_virtual_trackball">value_virtual_trackball</string>
+    <string name="value_mode_camera">value_camera</string>
+
+</resources>

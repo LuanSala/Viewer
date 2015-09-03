@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:movspeedpref="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        android:title="Configurações" >
+
+        <ListPreference
+            android:key="@string/key_mode_vision"
+            android:title="Modo de Visão"
+            android:dialogTitle="Modo de Visão"
+            android:entries="@array/mode_vision"
+            android:entryValues="@array/mode_vision_values"
+            android:defaultValue="@string/value_mode_virtual_trackball"
+            android:persistent="false"
+            android:textColor="@color/primary_text_default_material_light"/>
+
+        <lsa.viewercloudpoints.navigation_drawer.MovementSpeedPreference
+            android:key="@string/key_mov_speed"
+            android:title="Velocidade"
+            android:dialogTitle="Velocidade do Movimento"
+            android:textColor="@color/primary_text_default_material_light"
+            android:defaultValue="50"
+            movspeedpref:maxValue="100"/>
+
+        <SwitchPreference
+            android:key="@string/key_center_trackball"
+            android:title="Centralizar Trackball"
+            android:defaultValue="false"
+            android:persistent="false"
+            android:textColor="@color/primary_text_default_material_light"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory>
+
+        <SwitchPreference
+            android:key="@string/key_full_screen"
+            android:title="Full Screen"
+            android:defaultValue="false"
+            android:persistent="false"
+            android:textColor="@color/primary_text_default_material_light" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

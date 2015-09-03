@@ -1,0 +1,115 @@
+package lsa.viewercloudpoints.filechooser;
+
+import lsa.viewercloudpoints.R;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ListView;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+/**
+ * Created by Luan Sala on 05/03/2015.
+ */
+public class FileChooser extends ActionBarActivity {
+    private String fileSelected;
+    private boolean isFileSelected;
+    private File currentDirectory;
+    private ListView listView;
+    private Button button1;
+    private Button button2;
+    private ArrayAdapter<String> arrayAdapter;
+
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        currentDirectory = new File(File.separator);
+        setContentView(R.layout.file_chooser);
+        listView = (ListView) findViewById(R.id.listView);
+        button1 = (Button) findViewById(R.id.button1);
+        button2 = (Button) findViewById(R.id.button2);
+
+        fillListView(currentDirectory);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView parent, View view, int position, long id) {
+                File nextDir;
+                if( arrayAdapter.getItem(position).equals("..Parent Directory..") )
+                    nextDir = currentDirectory.getParentFile();
+                else
+                    nextDir = new File(currentDirectory, arrayAdapter.getItem(position));
+                if (nextDir.isDirectory()) {
+                    currentDirectory = nextDir;
+                    button2.setText("GO");
+                    isFileSelected = false;
+                    fillListView(currentDirectory);
+                } else {
+                    button2.setText(arrayAdapter.getItem(position));
+                    fileSelected = nextDir.getAbsolutePath();
+                    isFileSelected = true;
+                }
+            }
+        });
+
+        button1.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if( !currentDirectory.getAbsolutePath().equals(File.separator) ) {
+                    currentDirectory = currentDirectory.getParentFile();
+                    fillListView(currentDirectory);
+                } else {
+                    setResult(ActionBarActivity.RESULT_CANCELED);
+                    finish();
+                }
+            }
+        });
+
+        button2.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if( isFileSelected ) {
+                    Intent intent = new Intent();
+                    intent.putExtra("fileSelected",fileSelected);
+                    setResult(ActionBarActivity.RESULT_OK,intent);
+                    finish();
+                }
+            }
+        });
+    }
+
+    private void fillListView(File file){
+        List<String> list = new ArrayList<>();
+        File[] listFiles = file.listFiles();
+        if( listFiles!=null ) {
+            List<String> dirs  = new ArrayList<>();
+            List<String> files = new ArrayList<>();
+            for(File f : listFiles) {
+                if( f.isDirectory() )
+                    dirs.add( f.getName() );
+                else
+                    files.add( f.getName() );
+            }
+            Collections.sort( dirs );
+            Collections.sort( files );
+            list.addAll(dirs);
+            list.addAll(files);
+        }
+        if( !file.getAbsolutePath().equals(File.separator) ) {
+            list.add(0, "..Parent Directory..");
+            button1.setText("BACK");
+        } else
+            button1.setText("CANCEL");
+        arrayAdapter = new ArrayAdapter<>(FileChooser.this, android.R.layout.simple_list_item_1, list);
+        listView.setAdapter(arrayAdapter);
+    }
+
+}

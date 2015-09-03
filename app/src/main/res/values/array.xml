@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string-array name="mode_vision">
+        <item>Virtual Trackball</item>
+        <item>Câmera</item>
+    </string-array>
+    
+    <string-array name="mode_vision_values">
+        <item>@string/value_mode_virtual_trackball</item>
+        <item>@string/value_mode_camera</item>
+    </string-array>
+    
+</resources>

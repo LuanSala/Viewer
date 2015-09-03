@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawerLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!--<SurfaceView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/surfaceView"
+        android:fitsSystemWindows="false"/>-->
+
+    <TextureView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/textureView"
+        android:alpha="0"/>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="280dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start|left"
+        android:id="@+id/l_layout"
+        android:background="@color/background_material_light"
+        android:fitsSystemWindows="true">
+
+        <fragment android:name="lsa.viewercloudpoints.navigation_drawer.NavigationDrawerFragment"
+            android:id="@+id/fragment"
+            android:tag="@string/nav_drawer_TAG"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </LinearLayout>
+
+
+</android.support.v4.widget.DrawerLayout>
