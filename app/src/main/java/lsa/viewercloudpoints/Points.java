@@ -219,7 +219,6 @@ public class Points {
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,0);
 
         GLES20.glFlush();
-        //ad
     }
 
 
