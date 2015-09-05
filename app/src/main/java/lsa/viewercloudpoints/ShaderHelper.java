@@ -21,7 +21,7 @@ public class ShaderHelper {
         int isCompiled[] = new int[1];
         GLES20.glGetShaderiv(shader,GLES20.GL_COMPILE_STATUS,isCompiled,0);
         if(isCompiled[0]==0) {
-            printShaderInfoLog(shader);
+            printShaderInfoLog(shader,type);
             GLES20.glDeleteShader(shader);
         }
         return shader;
@@ -46,9 +46,11 @@ public class ShaderHelper {
         return program;
     }
 
-    private static void printShaderInfoLog(int sh){
+    private static void printShaderInfoLog(int sh,int type){
         String infoLog = GLES20.glGetShaderInfoLog(sh);
-        Log.e(TAG, "Problem in Shader Code:\n"+infoLog);
+        Log.e(TAG, "Problem in Shader Code - "+
+                ((type==GLES20.GL_VERTEX_SHADER)?"GL_VERTEX_SHADER":"GL_FRAGMENT_SHADER")+
+                "\n"+infoLog);
     }
 
     public static void printProgramInfoLog(int pr){
