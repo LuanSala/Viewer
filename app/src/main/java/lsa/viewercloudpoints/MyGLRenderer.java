@@ -53,7 +53,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     }
 
     public void onDrawFrame(GL10 unused) {
-        Log.d(TAG,"onDrawFrame");
+        //Log.d(TAG,"onDrawFrame");
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
         switch (Global.getStateProgram()){
             case Global.STATE_INIT_PROGRAM:
@@ -89,7 +89,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
                                 mProjectionMatrix, 0, camera.getViewMatrix(), 0);
                 }
                 mPoints.draw(MVPModified,mMVPMatrix);
-                Log.d(TAG,"Error = "+GLES20.glGetError());
                 MVPModified = false;
                 break;
         }
@@ -102,13 +101,13 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
             e.printStackTrace();
             System.exit(1);
         }*/
-        Log.d(TAG,"SurfaceChanged");
+        //Log.d(TAG,"SurfaceChanged");
         Global.SCREEN_WIDTH  = (short)width;
         Global.SCREEN_HEIGHT = (short)height;
         GLES20.glViewport(0, 0, width, height);
         float ratio = ((float) width) /((float) height);
         //Matrix.setIdentityM( mProjectionMatrix,0 );
-        Matrix.perspectiveM( mProjectionMatrix,0,60.0f,ratio,0.1f,30000.0f);
+        Matrix.perspectiveM( mProjectionMatrix,0,60.0f,ratio,0.01f,24000.0f);
 
         virtualTrackball.updateWindowSize();
         //fileButton.setModelViewMatrix();
@@ -116,7 +115,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     }
 
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
-        Log.d(TAG,"SurfaceCreated");
+        //Log.d(TAG,"SurfaceCreated");
         virtualTrackball = new VirtualTrackball();
         camera = new Camera();
         camera.moveX(5f);
