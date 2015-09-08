@@ -13,24 +13,25 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
 
 public class Points {
     private static final String TAG = "Points";
 
     private final String vertexShaderCode =
             "uniform mat4 uMVPMatrix;" +
-            "attribute vec3 vPosition;" +
+            "invariant gl_Position;" +
+            "attribute vec4 vPosition;" +
             "attribute vec3 vColor;" +
-            "varying mediump vec4 fColor;" +
+            "varying vec4 fColor;" +
             "void main() {" +
             "  gl_PointSize = float(3);" +
-            "  gl_Position = uMVPMatrix * vec4(vPosition,float(1));" +
+            "  gl_Position = uMVPMatrix * vPosition;" +
             "  fColor = vec4(vColor,float(1));" +
             "}";
 
     private final String fragmentShaderCode =
-            "varying mediump vec4 fColor;" +
+            "precision lowp float;" +
+            "varying vec4 fColor;" +
             "void main() {" +
             "  gl_FragColor = fColor;" +
             "}";
@@ -50,7 +51,13 @@ public class Points {
     //private ByteBuffer colorBuffer;
 
     private ByteBuffer buffer;
+    private ByteBuffer vertexBuffer;
+    private ByteBuffer colorBuffer;
+    private int sizeBuffer;
 
+    //Variavel para verificar se houve GL_INVALID_OPERATION na hora de renderizar na tela.
+    //Se ocorreu o erro, o VBO sera montado como "estrutura de arrays" (buffers separados).
+    private boolean problemBufferInterleaved = false;
     private boolean mediumPointCalculated = false;
 
     public Points(){
@@ -153,10 +160,6 @@ public class Points {
     }*/
 
     private void initSomePoints(){
-        //String fileName = "scan000.b";
-        //String fileName = "pointcloud_3d.b";
-        //String fileName = "points_referencia.b";
-        //String fileName = "nuvem_exemplo.b";
         File file;
         //if( Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) ) {
             //String baseDir = Environment.getExternalStorageDirectory().getAbsolutePath();
@@ -164,16 +167,21 @@ public class Points {
             file = new File(Global.file);
             if( file.isFile() ){
                 try {
-                    DataInputStream data = new DataInputStream(new FileInputStream(file));
-                    //FileInputStream data = new FileInputStream(file);
+                    //DataInputStream data = new DataInputStream(new FileInputStream(file));
+                    FileInputStream data = new FileInputStream(file);
 
                     int lengthFile = (int) file.length();
+                    sizeBuffer = lengthFile;
                     totalPoints = (lengthFile/15);
+
+                    System.gc();
 
                     buffer = ByteBuffer.allocate(lengthFile);
                     //buffer.order(ByteOrder.BIG_ENDIAN);
                     buffer.order(ByteOrder.LITTLE_ENDIAN);
-                    data.readFully( buffer.array(),0,lengthFile );
+                    buffer.position(0);
+                    data.read(buffer.array(),0,lengthFile);
+                    //data.readFully( buffer.array(),0,lengthFile );
 
                     data.close();
                 }catch(IOException e){
@@ -187,36 +195,98 @@ public class Points {
         GLES20.glGenBuffers(1,VBO,0);
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,VBO[0]);
         //GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER,((totalPoints*3)*4 + (totalPoints*3)*4),null,GLES20.GL_STATIC_DRAW);
-        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER,((totalPoints*3)*4 + (totalPoints*3)),buffer,GLES20.GL_STATIC_DRAW);
+        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER,sizeBuffer,buffer.position(0),GLES20.GL_STATIC_DRAW);
 
-        if(GLES20.glGetError()!=GLES20.GL_OUT_OF_MEMORY) {
-            //GLES20.glVertexAttribPointer(mPosition, 3, GLES20.GL_FLOAT, false, 15, 0);
-            GLES20.glEnableVertexAttribArray(mPosition);
-            //GLES20.glVertexAttribPointer(mColor, 3, GLES20.GL_UNSIGNED_BYTE, true, 15, 12);
-            GLES20.glEnableVertexAttribArray(mColor);
-        }else{
+        if(GLES20.glGetError()==GLES20.GL_OUT_OF_MEMORY) {
             GLES20.glDeleteBuffers(1,VBO,0);
-            Log.e(TAG,"No memory!!");
+            Log.e(TAG, "No memory!!");
+            buffer.limit(0);
+            buffer = null;
+            System.gc();
+            //Toast.makeText(Global.getContext(),"No Memory!!",Toast.LENGTH_LONG).show();
             System.exit(1);
         }
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,0);
     }
 
-    public void draw(boolean mvpModified,float []mvpMatrix){
-        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,VBO[0]);
-        GLES20.glUseProgram(mProgram);
+    //Deleta o antigo VBO e carrega 2 VBO separados. Um para o buffer de vertices e o outro para
+    // o buffer de cor.
+    // Esse metodo so e chamado caso tenha ocorrido GL_INVALID_OPERATION na chamada do comando
+    // glDrawArrays no metodo draw().
+    private void loadVBO2(){
+        if(!problemBufferInterleaved) {
+            GLES20.glDeleteBuffers(1, VBO, 0);
+            VBO = new int[2];
+            GLES20.glGenBuffers(2, VBO, 0);
+            GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, VBO[0]);
+            GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, vertexBuffer.array().length,
+                    vertexBuffer.position(0), GLES20.GL_STATIC_DRAW);
 
-        GLES20.glVertexAttribPointer(mPosition, 3, GLES20.GL_FLOAT, false, 15, 0);
-        GLES20.glVertexAttribPointer(mColor, 3, GLES20.GL_UNSIGNED_BYTE, true, 15, 12);
+            GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, VBO[1]);
+            GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, colorBuffer.array().length,
+                    colorBuffer.position(0), GLES20.GL_STATIC_DRAW);
+            GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+            problemBufferInterleaved = true;
+        }
+    }
+
+    // Separa o buffer (variavel buffer) em 2 buffers, colocando em um buffer os vertices e
+    // no outro buffer as cores.
+    private void separateBuffers(){
+        if(!problemBufferInterleaved) {
+            System.gc();
+            vertexBuffer = ByteBuffer.allocate(totalPoints * 3 * 4).order(ByteOrder.LITTLE_ENDIAN);
+            colorBuffer = ByteBuffer.allocate(totalPoints * 3).order(ByteOrder.LITTLE_ENDIAN);
+            vertexBuffer.position(0);
+            colorBuffer.position(0);
+            for (int i = 0; i < (totalPoints - 1); i++) {
+                vertexBuffer.putFloat(buffer.getFloat(i * 15));
+                vertexBuffer.putFloat(buffer.getFloat((i * 15) + 4));
+                vertexBuffer.putFloat(buffer.getFloat((i * 15) + 8));
+                colorBuffer.put(buffer.get((i * 15) + 12));
+                colorBuffer.put(buffer.get((i * 15) + 13));
+                colorBuffer.put(buffer.get((i * 15) + 14));
+            }
+        }
+    }
+
+    public void draw(boolean mvpModified,float []mvpMatrix){
+        GLES20.glUseProgram(mProgram);
         if( mvpModified )
             GLES20.glUniformMatrix4fv(mMVPMatrix, 1, false, mvpMatrix, 0);
-        Log.d(TAG,"Error1 = "+GLES20.glGetError());
-        GLES20.glDrawArrays(GLES20.GL_POINTS,0,totalPoints);
-        Log.d(TAG,"Error = "+GLES20.glGetError());  //@TODO: está dando GL_INVALID_OPERATION aqui
-        // em glDrawArrays e esta impossibilitando de renderizar os pontos.
 
-        GLES20.glUseProgram(0);
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,VBO[0]);
+
+        if(problemBufferInterleaved) {
+            GLES20.glVertexAttribPointer(mPosition, 3, GLES20.GL_FLOAT, false, 0, 0);
+            GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,VBO[1]);
+            GLES20.glVertexAttribPointer(mColor, 3,GLES20.GL_UNSIGNED_BYTE,true,0,0);
+        }else{
+            // Descobri que da erro no DrawArrays por causa de alguma
+            // coisa que ocorre aqui no VertexAttribPointer. Não reconhece o stride '15', e tambem
+            // nao reconhece stride que nao e multiplo de 4.
+            GLES20.glVertexAttribPointer(mPosition, 3, GLES20.GL_FLOAT, false, 15, 0);
+            GLES20.glVertexAttribPointer(mColor, 3, GLES20.GL_UNSIGNED_BYTE, true, 15, 12);
+        }
+
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,0);
+
+        GLES20.glEnableVertexAttribArray(mPosition);
+        GLES20.glEnableVertexAttribArray(mColor);
+
+        GLES20.glDrawArrays(GLES20.GL_POINTS,0,totalPoints);
+        int error;
+        while((error = GLES20.glGetError())!=GLES20.GL_NO_ERROR){
+            if(error==GLES20.GL_INVALID_OPERATION){
+                separateBuffers();
+                loadVBO2();
+                draw(mvpModified,mvpMatrix);
+            }
+        }
+
+        GLES20.glDisableVertexAttribArray(mPosition);
+        GLES20.glDisableVertexAttribArray(mColor);
+        GLES20.glUseProgram(0);
 
         GLES20.glFlush();
     }
