@@ -275,13 +275,11 @@ public class Points {
         GLES20.glEnableVertexAttribArray(mColor);
 
         GLES20.glDrawArrays(GLES20.GL_POINTS,0,totalPoints);
-        int error;
-        while((error = GLES20.glGetError())!=GLES20.GL_NO_ERROR){
-            if(error==GLES20.GL_INVALID_OPERATION){
-                separateBuffers();
-                loadVBO2();
-                draw(mvpModified,mvpMatrix);
-            }
+        if(!problemBufferInterleaved && GLES20.glGetError()==GLES20.GL_INVALID_OPERATION){
+            separateBuffers();
+            loadVBO2();
+            draw(mvpModified,mvpMatrix);
+            return;
         }
 
         GLES20.glDisableVertexAttribArray(mPosition);
