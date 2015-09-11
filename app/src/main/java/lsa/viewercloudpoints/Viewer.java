@@ -1,6 +1,8 @@
 package lsa.viewercloudpoints;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
@@ -9,7 +11,8 @@ import android.util.Log;
 
 import lsa.viewercloudpoints.navigation_drawer.MovementSpeedPreference;
 
-public class Viewer extends Activity {
+public class Viewer extends Activity
+    implements DialogInterface.OnClickListener {
     private static final String TAG = "Viewer";
     private MyGLSurfaceView mGLView;
     private Global global;
@@ -49,6 +52,21 @@ public class Viewer extends Activity {
         //rLayout.setFitsSystemWindows(true);
     }
 
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.message_dialog_backButton_exit)
+                .setTitle(R.string.title_dialog_backButton_exit);
+        builder.setPositiveButton(R.string.positiveButton_dialog_backButton_exit,this);
+        builder.setNegativeButton(R.string.negativeButton_dialog_backButton_exit,this);
+        builder.create();
+        builder.show();
+    }
+
+    public void onClick(DialogInterface dialog, int which) {
+        if(which==DialogInterface.BUTTON_POSITIVE)
+            super.onBackPressed();
+    }
 
     /*@Override
     public boolean onKeyDown(int keyCode, KeyEvent event){
