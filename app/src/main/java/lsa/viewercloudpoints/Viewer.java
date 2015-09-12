@@ -59,7 +59,6 @@ public class Viewer extends Activity
                 .setTitle(R.string.title_dialog_backButton_exit);
         builder.setPositiveButton(R.string.positiveButton_dialog_backButton_exit,this);
         builder.setNegativeButton(R.string.negativeButton_dialog_backButton_exit,this);
-        builder.create();
         builder.show();
     }
 
