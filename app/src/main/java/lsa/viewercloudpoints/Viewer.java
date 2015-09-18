@@ -7,7 +7,6 @@ import android.graphics.Point;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 
 import lsa.viewercloudpoints.navigation_drawer.MovementSpeedPreference;
 
@@ -16,6 +15,9 @@ public class Viewer extends Activity
     private static final String TAG = "Viewer";
     private MyGLSurfaceView mGLView;
     private Global global;
+
+    // Variavel da navigation drawer
+    DrawerLayout drawerLayout;
 
     /** Called when the activity is first created. */
     @Override
@@ -31,8 +33,8 @@ public class Viewer extends Activity
         Global.setViewingStyle(Global.VIEW_USING_TRACKBALL);
         setContentView(R.layout.layout_viewer);
         mGLView = new MyGLSurfaceView(this);
-        DrawerLayout rLayout = (DrawerLayout)findViewById(R.id.drawerLayout);
-        rLayout.addView(mGLView,0);
+        drawerLayout = (DrawerLayout)findViewById(R.id.drawerLayout);
+        drawerLayout.addView(mGLView,0);
 
         ((PreferenceFragment)getFragmentManager().findFragmentByTag(getString(R.string.nav_drawer_TAG))).
                 findPreference(getString(R.string.key_mov_speed)).
@@ -54,12 +56,16 @@ public class Viewer extends Activity
 
     @Override
     public void onBackPressed() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.message_dialog_backButton_exit)
-                .setTitle(R.string.title_dialog_backButton_exit);
-        builder.setPositiveButton(R.string.positiveButton_dialog_backButton_exit,this);
-        builder.setNegativeButton(R.string.negativeButton_dialog_backButton_exit,this);
-        builder.show();
+        if( drawerLayout.isDrawerOpen(findViewById(R.id.linear_layout_drawerLayout)) )
+            drawerLayout.closeDrawer(findViewById(R.id.linear_layout_drawerLayout));
+        else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage(R.string.message_dialog_backButton_exit)
+                    .setTitle(R.string.title_dialog_backButton_exit);
+            builder.setPositiveButton(R.string.positiveButton_dialog_backButton_exit, this);
+            builder.setNegativeButton(R.string.negativeButton_dialog_backButton_exit, this);
+            builder.show();
+        }
     }
 
     public void onClick(DialogInterface dialog, int which) {
