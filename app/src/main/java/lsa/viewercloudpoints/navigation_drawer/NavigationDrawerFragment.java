@@ -49,14 +49,16 @@ public class NavigationDrawerFragment extends PreferenceFragment
                 }
                 notifyAll();
             }
-            ((DrawerLayout) getActivity().findViewById(R.id.drawerLayout)).closeDrawer(Gravity.LEFT);
+            ((DrawerLayout) getActivity().findViewById(R.id.drawerLayout)).closeDrawer(
+                    getActivity().findViewById(R.id.linear_layout_drawerLayout));
         }
         if( preference.getKey().equals(getString(R.string.key_center_trackball)) ){
             synchronized (this){
                 Global.useTrackballCentered((boolean)newValue);
                 notifyAll();
             }
-            ((DrawerLayout) getActivity().findViewById(R.id.drawerLayout)).closeDrawer(Gravity.LEFT);
+            ((DrawerLayout) getActivity().findViewById(R.id.drawerLayout)).closeDrawer(
+                    getActivity().findViewById(R.id.linear_layout_drawerLayout));
         }
         if( preference.getKey().equals(getString(R.string.key_full_screen)) ) {
             if(newValue.equals(true)) {
