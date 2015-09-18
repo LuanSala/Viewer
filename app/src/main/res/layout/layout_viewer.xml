@@ -22,7 +22,7 @@
         android:layout_width="280dp"
         android:layout_height="match_parent"
         android:layout_gravity="start|left"
-        android:id="@+id/l_layout"
+        android:id="@+id/linear_layout_drawerLayout"
         android:background="@color/background_material_light"
         android:fitsSystemWindows="true">
 
