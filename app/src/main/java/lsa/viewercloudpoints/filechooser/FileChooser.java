@@ -22,6 +22,13 @@ import java.util.List;
  * Created by Luan Sala on 05/03/2015.
  */
 public class FileChooser extends ActionBarActivity {
+    private static final String TAG = "FileChooser";
+
+    //STATES para a recuperacao dos dados no ciclo de vida do FileChooser.
+    //Usado quando a orientacao da tela muda.
+    private static final String STATE_CURRENT_DIRECTORY = "currentDirectory";
+    private static final String STATE_FILE_SELECTED = "fileSelected";
+
     private String fileSelected;
     private boolean isFileSelected;
     private File currentDirectory;
@@ -32,7 +39,15 @@ public class FileChooser extends ActionBarActivity {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        currentDirectory = new File(File.separator);
+        if(savedInstanceState!=null) {
+            currentDirectory = new File(savedInstanceState.getString(STATE_CURRENT_DIRECTORY, File.separator));
+            String file = savedInstanceState.getString(STATE_FILE_SELECTED);
+            if(file!=null){
+                isFileSelected = true;
+                fileSelected = file;
+            }
+        }else
+            currentDirectory = new File(File.separator);
         setContentView(R.layout.file_chooser);
         listView = (ListView) findViewById(R.id.listView);
         button1 = (Button) findViewById(R.id.button1);
@@ -88,6 +103,21 @@ public class FileChooser extends ActionBarActivity {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(STATE_CURRENT_DIRECTORY,currentDirectory.getAbsolutePath());
+        if(isFileSelected)
+            outState.putString(STATE_FILE_SELECTED,fileSelected);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(isFileSelected)
+            button2.setText( new File(fileSelected).getName() );
     }
 
     // Aqui você preenche a ActionBar colocando os botões desejados.
