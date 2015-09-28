@@ -31,20 +31,28 @@
             android:tag="@string/nav_drawer_TAG"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/Button_open_file_nav_drawer"/>
+            android:layout_above="@+id/layout_buttons_in_bottom_nav_drawer"/>
 
-        <Button
-            android:id="@+id/Button_open_file_nav_drawer"
+        <LinearLayout
+            android:id="@+id/layout_buttons_in_bottom_nav_drawer"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
             android:layout_alignParentBottom="true"
-            android:text="Abrir arquivo"
-            android:textColor="@color/abc_primary_text_material_light"
-            android:textSize="12sp"
-            android:drawableTop="@drawable/ic_action_storage"
-            android:textIsSelectable="false"
-            android:onClick="openFileChooser"/>
+            android:layout_gravity="bottom"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/Button_open_file_nav_drawer"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Abrir arquivo"
+                android:textColor="@color/abc_primary_text_material_light"
+                android:textSize="12sp"
+                android:drawableTop="@drawable/ic_action_storage"
+                android:textIsSelectable="false"
+                android:onClick="openFileChooser"/>
+
+        </LinearLayout>
 
     </RelativeLayout>
 
