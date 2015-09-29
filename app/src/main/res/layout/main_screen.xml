@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
-    android:background="#ff000000">
+    android:background="@color/background_material_dark">
 
     <LinearLayout
         android:orientation="horizontal"
@@ -14,14 +14,14 @@
             android:layout_height="wrap_content"
             android:text="@string/new_file"
             android:id="@+id/button"
-            android:drawableLeft="@drawable/ic_action_new"
-            android:textColor="#ffffffff"
+            android:drawableLeft="@drawable/ic_action_storage"
+            android:textColor="@color/abc_primary_text_material_dark"
             android:textAllCaps="false"
             android:textIsSelectable="false"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:layout_centerInParent="true"
             android:textStyle="italic"
-            android:onClick="loadRenderPoints" />
+            android:onClick="openFileChooser" />
 
     </LinearLayout>
 
