@@ -177,8 +177,17 @@ public class Points {
         buffer.limit(0);
         buffer = null;
         initSomePoints();
-        GLES20.glDeleteBuffers(1,VBO,0);
-        loadVBO();
+        if( problemBufferInterleaved ) {
+            vertexBuffer.limit(0);
+            vertexBuffer = null;
+            colorBuffer.limit(0);
+            colorBuffer = null;
+            separateBuffers();
+            loadVBO2();
+        } else {
+            GLES20.glDeleteBuffers(VBO.length, VBO, 0);
+            loadVBO();
+        }
         mMediumPointThread.run();
         enable();
     }
@@ -238,8 +247,8 @@ public class Points {
     // Esse metodo so e chamado caso tenha ocorrido GL_INVALID_OPERATION na chamada do comando
     // glDrawArrays no metodo draw().
     private void loadVBO2(){
-        if(!problemBufferInterleaved) {
-            GLES20.glDeleteBuffers(1, VBO, 0);
+        if(problemBufferInterleaved) {
+            GLES20.glDeleteBuffers(VBO.length, VBO, 0);
             VBO = new int[2];
             GLES20.glGenBuffers(2, VBO, 0);
             GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, VBO[0]);
@@ -250,14 +259,13 @@ public class Points {
             GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, colorBuffer.array().length,
                     colorBuffer.position(0), GLES20.GL_STATIC_DRAW);
             GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
-            problemBufferInterleaved = true;
         }
     }
 
     // Separa o buffer (variavel buffer) em 2 buffers, colocando em um buffer os vertices e
     // no outro buffer as cores.
     private void separateBuffers(){
-        if(!problemBufferInterleaved) {
+        if(problemBufferInterleaved) {
             System.gc();
             vertexBuffer = ByteBuffer.allocate(totalPoints * 3 * 4).order(ByteOrder.LITTLE_ENDIAN);
             colorBuffer = ByteBuffer.allocate(totalPoints * 3).order(ByteOrder.LITTLE_ENDIAN);
@@ -300,6 +308,7 @@ public class Points {
 
         GLES20.glDrawArrays(GLES20.GL_POINTS,0,totalPoints);
         if(!problemBufferInterleaved && GLES20.glGetError()==GLES20.GL_INVALID_OPERATION){
+            problemBufferInterleaved = true;
             separateBuffers();
             loadVBO2();
             draw(mvpModified,mvpMatrix);
