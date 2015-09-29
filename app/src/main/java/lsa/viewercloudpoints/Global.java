@@ -13,6 +13,14 @@ import java.lang.reflect.InvocationTargetException;
  * Created by Luan Sala on 25/02/2015.
  */
 public class Global {
+
+    /**
+     * Codigo de requisicao usado para identificar o resultado da atividade FileChooser
+     * via Intent.
+     * @see lsa.viewercloudpoints.filechooser.FileChooser
+     * @see android.content.Intent
+     */
+    public static final int PICK_FILE = 1;
     /**
      * Estado do programa.
      * Estado em que o programa se encontra ao inicia-lo.
