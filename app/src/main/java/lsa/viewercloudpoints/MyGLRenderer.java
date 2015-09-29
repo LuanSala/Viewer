@@ -22,6 +22,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     private Camera camera;
 
     private Points mPoints;
+    private boolean updatePoints;
     private boolean MVPModified;
 
     private static final short COLOR_BUFFER             = 0;
@@ -54,6 +55,11 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
     public void onDrawFrame(GL10 unused) {
         //Log.d(TAG,"onDrawFrame");
+        if(updatePoints){
+            mPoints.disable();
+            mPoints.update();
+            updatePoints = false;
+        }
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
         switch (Global.getStateProgram()){
             case Global.STATE_INIT_PROGRAM:
@@ -65,32 +71,34 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
                 GLES20.glDisable(GLES20.GL_BLEND);
                 break;
             case Global.STATE_RENDER_POINTS:
-                if( MVPModified ) {
-                    if (Global.getViewingStyle() == Global.VIEW_USING_TRACKBALL) {
-                        if (Global.isTrackballCentered()) {
-                            synchronized (mPoints.getMediumPointThread()){
-                                if(!mPoints.mediumPointCalculated())
-                                    try {
-                                        mPoints.getMediumPointThread().wait();
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
-                                    }
-                            }
-                            Matrix.translateM(tempMatrix, 0, virtualTrackball.getMatrix(), 0,
-                                    -mPoints.getMediumPoint().getX(),
-                                    -mPoints.getMediumPoint().getY(),
-                                    -mPoints.getMediumPoint().getZ());
+                if(mPoints.isEnabled()) {
+                    if (MVPModified) {
+                        if (Global.getViewingStyle() == Global.VIEW_USING_TRACKBALL) {
+                            if (Global.isTrackballCentered()) {
+                                synchronized (mPoints.getMediumPointThread()) {
+                                    if (!mPoints.mediumPointCalculated())
+                                        try {
+                                            mPoints.getMediumPointThread().wait();
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
+                                }
+                                Matrix.translateM(tempMatrix, 0, virtualTrackball.getMatrix(), 0,
+                                        -mPoints.getMediumPoint().getX(),
+                                        -mPoints.getMediumPoint().getY(),
+                                        -mPoints.getMediumPoint().getZ());
+                            } else
+                                System.arraycopy(virtualTrackball.getMatrix(), 0, tempMatrix, 0, 16);
+                            Matrix.multiplyMM(mMVPMatrix, 0,
+                                    mProjectionMatrix, 0, tempMatrix, 0);
                         } else
-                            System.arraycopy(virtualTrackball.getMatrix(), 0, tempMatrix, 0, 16);
-                        Matrix.multiplyMM(mMVPMatrix, 0,
-                                mProjectionMatrix, 0, tempMatrix, 0);
-                    } else
-                        Matrix.multiplyMM(mMVPMatrix, 0,
-                                mProjectionMatrix, 0, camera.getViewMatrix(), 0);
+                            Matrix.multiplyMM(mMVPMatrix, 0,
+                                    mProjectionMatrix, 0, camera.getViewMatrix(), 0);
+                    }
+                    mPoints.draw(MVPModified, mMVPMatrix);
+                    MVPModified = false;
+                    break;
                 }
-                mPoints.draw(MVPModified,mMVPMatrix);
-                MVPModified = false;
-                break;
         }
     }
 
@@ -107,7 +115,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         GLES20.glViewport(0, 0, width, height);
         float ratio = ((float) width) /((float) height);
         //Matrix.setIdentityM( mProjectionMatrix,0 );
-        Matrix.perspectiveM( mProjectionMatrix,0,60.0f,ratio,0.01f,24000.0f);
+        Matrix.perspectiveM( mProjectionMatrix,0,60.0f,ratio,0.06f,20000.0f);
 
         virtualTrackball.updateWindowSize();
         //fileButton.setModelViewMatrix();
@@ -132,7 +140,11 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         GLES20.glDepthFunc(GLES20.GL_LEQUAL);
 
         //fileButton = new TexOpenFile();
-        mPoints    = new Points();
+        mPoints = new Points();
+    }
+
+    public void updatePoints(){
+        updatePoints = true;
     }
 
     public void updateFrameBuffer(int width, int height){

@@ -3,16 +3,20 @@ package lsa.viewercloudpoints;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.support.v4.widget.DrawerLayout;
+import android.view.View;
 
+import lsa.viewercloudpoints.filechooser.FileChooser;
 import lsa.viewercloudpoints.navigation_drawer.MovementSpeedPreference;
 
 public class Viewer extends Activity
     implements DialogInterface.OnClickListener {
     private static final String TAG = "Viewer";
+
     private MyGLSurfaceView mGLView;
     private Global global;
 
@@ -23,10 +27,6 @@ public class Viewer extends Activity
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-        //        WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 
         //Global.setStateProgram(Global.STATE_INIT_PROGRAM);
         Global.setStateProgram(Global.STATE_RENDER_POINTS);
@@ -46,12 +46,25 @@ public class Viewer extends Activity
 
         global = new Global(mGLView,this);
 
-        Point p = new Point();
-        getWindowManager().getDefaultDisplay().getSize(p);
-        System.out.println("Size = "+p.x+" "+p.y);
+        //Point p = new Point();
+        //getWindowManager().getDefaultDisplay().getSize(p);
+        //System.out.println("Size = "+p.x+" "+p.y);
+    }
 
-        //rLayout.setStatusBarBackgroundColor(getResources().getColor(android.R.color.transparent));
-        //rLayout.setFitsSystemWindows(true);
+    public void openFileChooser(View view){
+        Intent render = new Intent(this,FileChooser.class);
+        this.startActivityForResult(render,Global.PICK_FILE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if( requestCode==Global.PICK_FILE ){
+            if( resultCode==RESULT_OK ){
+                Global.file = data.getStringExtra("fileSelected");
+                ((MyGLRenderer)mGLView.getRenderer()).updatePoints();
+                mGLView.requestRender();
+            }
+        }
     }
 
     @Override
@@ -72,22 +85,6 @@ public class Viewer extends Activity
         if(which==DialogInterface.BUTTON_POSITIVE)
             super.onBackPressed();
     }
-
-    /*@Override
-    public boolean onKeyDown(int keyCode, KeyEvent event){
-        if( keyCode == KeyEvent.KEYCODE_VOLUME_UP ) {
-            Global.setViewingStyle( Global.VIEW_USING_CAMERA );
-            ((MyGLRenderer)(mGLView.getRenderer())).refreshMVP();
-            mGLView.requestRender();
-            return true;
-        }else if( keyCode == KeyEvent.KEYCODE_VOLUME_DOWN ) {
-            Global.setViewingStyle( Global.VIEW_USING_TRACKBALL );
-            ((MyGLRenderer)(mGLView.getRenderer())).refreshMVP();
-            mGLView.requestRender();
-            return true;
-        }
-        return super.onKeyDown(keyCode,event);
-    }*/
 
     //@TODO: configurar apropriadamente os métodos de saida do aplicativo nas classes corretas.
 

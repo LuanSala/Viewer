@@ -42,6 +42,7 @@ public class Points {
     private int mMVPMatrix;
 
     private int totalPoints;
+    private boolean isEnabled;
 
     private MediumPoint mMediumPointThread;
     private VectorFloat mediumPoint = new VectorFloat(3);
@@ -77,6 +78,7 @@ public class Points {
         mMediumPointThread = new MediumPoint();
         mMediumPointThread.start();
 
+        enable();
         Log.d(TAG,"Rendered points = "+totalPoints);
     }
 
@@ -90,6 +92,18 @@ public class Points {
 
     public VectorFloat getMediumPoint() {
         return mediumPoint;
+    }
+
+    public boolean isEnabled(){
+        return isEnabled;
+    }
+
+    public void enable(){
+        isEnabled = true;
+    }
+
+    public void disable(){
+        isEnabled = false;
     }
 
     /** Funcao temporaria... Somente para testes */
@@ -158,6 +172,16 @@ public class Points {
             }
         }
     }*/
+
+    public void update(){
+        buffer.limit(0);
+        buffer = null;
+        initSomePoints();
+        GLES20.glDeleteBuffers(1,VBO,0);
+        loadVBO();
+        mMediumPointThread.run();
+        enable();
+    }
 
     private void initSomePoints(){
         File file;
