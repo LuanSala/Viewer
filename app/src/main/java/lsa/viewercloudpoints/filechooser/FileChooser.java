@@ -11,8 +11,11 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,7 +36,13 @@ public class FileChooser extends ActionBarActivity {
     private boolean isFileSelected;
     private File currentDirectory;
     private ListView listView;
+    /**
+     * Botao que volta uma pasta ou fecha o FileChooser
+     */
     private Button button1;
+    /**
+     * Botao que escolhe o arquivo selecionado
+     */
     private Button button2;
     private MyArrayAdapter<OptionFile> arrayAdapter;
 
@@ -92,14 +101,29 @@ public class FileChooser extends ActionBarActivity {
             }
         });
 
+
         button2.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if( isFileSelected ) {
-                    Intent intent = new Intent();
-                    intent.putExtra("fileSelected",fileSelected);
-                    setResult(ActionBarActivity.RESULT_OK,intent);
-                    finish();
+                    try {
+                        FileInputStream file = new FileInputStream(fileSelected);
+                        byte[] numberMagicBytes = new byte[4];
+                        String numberMagic;
+                        file.read(numberMagicBytes,0,4);
+                        numberMagic = new String(numberMagicBytes);
+                        file.close();
+                        if(numberMagic.equals("PCl1") || numberMagic.equals("PCl2")) {
+                            Intent intent = new Intent();
+                            intent.putExtra("fileSelected",fileSelected);
+                            setResult(ActionBarActivity.RESULT_OK,intent);
+                            finish();
+                        }else
+                            Toast.makeText(getApplicationContext(),"File is not valid!",Toast.LENGTH_LONG).show();
+                    } catch(IOException e){
+                        Toast.makeText(getApplicationContext(),"File is not valid!",Toast.LENGTH_LONG).show();
+                        //e.printStackTrace();
+                    }
                 }
             }
         });
