@@ -7,7 +7,8 @@
 
     <style name="ViewerTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowTranslucentNavigation">false</item>
-        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:hardwareAccelerated">true</item>
     </style>
 
 </resources>
