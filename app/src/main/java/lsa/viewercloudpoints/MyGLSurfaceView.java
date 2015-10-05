@@ -10,6 +10,8 @@ import android.preference.Preference;
 import android.util.Log;
 import android.view.MotionEvent;
 
+import java.util.ArrayList;
+
 public class MyGLSurfaceView extends GLSurfaceView
     implements Preference.OnPreferenceChangeListener{
     private static final String TAG = "MyGLSurfaceView";
@@ -19,13 +21,14 @@ public class MyGLSurfaceView extends GLSurfaceView
 
     private float speedMultiTouch;
 
+    private ArrayList<Integer> pointerID = new ArrayList<>();
     private VectorFloat mPreviousPointerPos = new VectorFloat(2);
 
     public MyGLSurfaceView(Context context){
         super(context);
         Global.setContext(context);
 
-        //Cria contexto de uso do OpengGL ES 2.0
+        //Cria contexto de uso do OpenGL ES 2.0
         setEGLContextClientVersion( 2 );
 
         mRenderer = new MyGLRenderer();
@@ -64,26 +67,26 @@ public class MyGLSurfaceView extends GLSurfaceView
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        final float actualX = event.getX();
-        final float actualY = event.getY();
-
-        if( !gestures.detectGestures(event,actualX,actualY) ) {
+        if(event.getPointerCount()==1) {
+            final float actualX = event.getX();
+            final float actualY = event.getY();
             switch (event.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
                     if (Global.getStateProgram() == Global.STATE_INIT_PROGRAM) {
                         //if (Global.clickedInButton(mRenderer.fileButton, actualX, actualY)) {
-                            Global.setStateProgram(Global.STATE_RENDER_POINTS);
-                            requestRender();
+                        Global.setStateProgram(Global.STATE_RENDER_POINTS);
+                        requestRender();
                         //}
                     }
-                    mPreviousPointerPos.set(actualX ,actualY);
+                    pointerID.add(event.getPointerId(event.getActionIndex()));
+                    mPreviousPointerPos.set(actualX, actualY);
                     mRenderer.getVirtualTrackball().pointerDown(actualX, actualY);
                     break;
                 case MotionEvent.ACTION_MOVE:
                     if (Global.getStateProgram() == Global.STATE_RENDER_POINTS) {
                         float dx = actualX - mPreviousPointerPos.getX();
                         float dy = actualY - mPreviousPointerPos.getY();
-                        if( Global.getViewingStyle()==Global.VIEW_USING_TRACKBALL )
+                        if (Global.getViewingStyle() == Global.VIEW_USING_TRACKBALL)
                             mRenderer.getVirtualTrackball().pointerMove(actualX, actualY);
                         else
                             mRenderer.getCamera().rotate(-dy, -dx, 0);
@@ -92,8 +95,12 @@ public class MyGLSurfaceView extends GLSurfaceView
                         mPreviousPointerPos.set(actualX, actualY);
                     }
                     break;
+                case MotionEvent.ACTION_UP:
+                    pointerID.clear();
+                    break;
             }
-        }
+        } else
+            gestures.detectGestures(event);
         return true;
     }
 
@@ -108,7 +115,7 @@ public class MyGLSurfaceView extends GLSurfaceView
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         if( preference.getKey().equals(getResources().getString(R.string.key_mov_speed)) ) {
-            Log.d(TAG,"MovementSpeed changed: "+newValue);
+            //Log.d(TAG,"MovementSpeed changed: "+newValue);
             speedMultiTouch = calculateSpeedMultiTouch((int)newValue);
         }
         return true;
@@ -134,7 +141,6 @@ public class MyGLSurfaceView extends GLSurfaceView
         private static final byte MOVE_DOWN = 4;
         private static final byte ROTATE_Z = 8;
 
-        private int secondPointerID;
         private VectorFloat[] previousPointerPos = new VectorFloat[MAX_POINTERS-1];
         private VectorFloat[] vectorDisplacPointer = new VectorFloat[MAX_POINTERS];
         private float modulus[] = new float[MAX_POINTERS];
@@ -155,20 +161,26 @@ public class MyGLSurfaceView extends GLSurfaceView
          * Método responsável por capturar os dados dos ponteiros tocados no touch e detectar se
          * houve um gesto de movimento ou rotação.
          * @param event Evento gerado pelo touch
-         * @param actualX Coordenada X do ponteiro retornado por event.getX()
-         * @param actualY Coordenada Y do ponteiro retornado por event.getX()
          * @return true se o gesto detectado for um gesto multitouch, false caso contrário.
          */
-        public boolean detectGestures(MotionEvent event,float actualX,float actualY){
+        public boolean detectGestures(MotionEvent event){
             boolean ret = false;
             switch(event.getActionMasked()) {
                 case MotionEvent.ACTION_POINTER_DOWN:
+                    pointerID.add(event.getPointerId(event.getActionIndex()));
                     if (event.getPointerCount() == 2) {
                         mRenderer.getVirtualTrackball().pointerUp();
-                        secondPointerID = event.getPointerId(1);
-                        float actualSecondX = event.getX(1);
-                        float actualSecondY = event.getY(1);
-                        distancePointers[DIST_1_TO_2].set(actualSecondX - actualX, actualSecondY - actualY);
+                        int firstPointerIndex = event.findPointerIndex(pointerID.get(0));
+                        int secondPointerIndex = event.findPointerIndex(pointerID.get(1));
+                        float actualSecondX, actualSecondY;
+                        try {
+                            actualSecondX = event.getX(secondPointerIndex);
+                            actualSecondY = event.getY(secondPointerIndex);
+                            distancePointers[DIST_1_TO_2].set(actualSecondX - event.getX(firstPointerIndex),
+                                    actualSecondY - event.getY(firstPointerIndex));
+                        }catch(IllegalArgumentException e){
+                            break;
+                        }
                         oldDistancePointers = distancePointers[DIST_1_TO_2].norm();
 
                         previousPointerPos[POS_POINTER_2].set(actualSecondX, actualSecondY);
@@ -178,15 +190,24 @@ public class MyGLSurfaceView extends GLSurfaceView
                 case MotionEvent.ACTION_MOVE:
                     if (Global.getStateProgram() == Global.STATE_RENDER_POINTS) {
                         if (event.getPointerCount() == 2) {
-                            int pointerIndex = event.findPointerIndex(secondPointerID);
-                            float actualSecondX = event.getX(pointerIndex);
-                            float actualSecondY = event.getY(pointerIndex);
-                            distancePointers[DIST_1_TO_2].set(actualSecondX - actualX, actualSecondY - actualY);
+                            int firstPointerIndex = event.findPointerIndex(pointerID.get(0));
+                            int secondPointerIndex = event.findPointerIndex(pointerID.get(1));
+                            float actualFirstX, actualFirstY;
+                            float actualSecondX, actualSecondY;
+                            try {
+                                actualFirstX = event.getX(firstPointerIndex);
+                                actualFirstY = event.getY(firstPointerIndex);
+                                actualSecondX = event.getX(secondPointerIndex);
+                                actualSecondY = event.getY(secondPointerIndex);
+                            }catch(IllegalArgumentException e){
+                                break;
+                            }
+                            distancePointers[DIST_1_TO_2].set(actualSecondX - actualFirstX, actualSecondY - actualFirstY);
                             float actualDistancePointers = distancePointers[DIST_1_TO_2].norm();
 
                             vectorDisplacPointer[DISPLAC_POINTER_1].set(
-                                    actualX - mPreviousPointerPos.getX(),
-                                    actualY - mPreviousPointerPos.getY() );
+                                    actualFirstX - mPreviousPointerPos.getX(),
+                                    actualFirstY - mPreviousPointerPos.getY() );
 
                             vectorDisplacPointer[DISPLAC_POINTER_2].set(
                                     actualSecondX - previousPointerPos[POS_POINTER_2].getX(),
@@ -202,7 +223,7 @@ public class MyGLSurfaceView extends GLSurfaceView
 
                             oldDistancePointers = actualDistancePointers;
                             previousPointerPos[POS_POINTER_2].set(actualSecondX, actualSecondY);
-                            mPreviousPointerPos.set(actualX, actualY);
+                            mPreviousPointerPos.set(actualFirstX, actualFirstY);
                             mRenderer.refreshMVP();
                             requestRender();
                             ret = true;
@@ -210,13 +231,37 @@ public class MyGLSurfaceView extends GLSurfaceView
                     }
                     break;
                 case MotionEvent.ACTION_POINTER_UP:
-                    if (event.getPointerCount() == 2) {
-                        int index = event.getActionIndex();
-                        if (index == 1) index = 0;
-                        else index = 1;
-                        mPreviousPointerPos.set( event.getX(index), event.getY(index) );
-                        ret = true;
+                    int indexList = pointerID.indexOf(event.getPointerId(event.getActionIndex()));
+                    if(event.getPointerCount()>2) {
+                        if (indexList == 0){
+                            float actualFirstX = event.getX(event.findPointerIndex(pointerID.get(1)));
+                            float actualFirstY = event.getY(event.findPointerIndex(pointerID.get(1)));
+                            float actualSecondX = event.getX(event.findPointerIndex(pointerID.get(2)));
+                            float actualSecondY = event.getY(event.findPointerIndex(pointerID.get(2)));
+                            mPreviousPointerPos.set( actualFirstX , actualFirstY );
+                            previousPointerPos[POS_POINTER_2].set( actualSecondX , actualSecondY );
+
+                            distancePointers[DIST_1_TO_2].set(actualSecondX - actualFirstX, actualSecondY - actualFirstY);
+                            oldDistancePointers = distancePointers[DIST_1_TO_2].norm();
+                        }else if(indexList == 1){
+                            float actualFirstX = event.getX(event.findPointerIndex(pointerID.get(0)));
+                            float actualFirstY = event.getY(event.findPointerIndex(pointerID.get(0)));
+                            float actualSecondX = event.getX(event.findPointerIndex(pointerID.get(2)));
+                            float actualSecondY = event.getY(event.findPointerIndex(pointerID.get(2)));
+                            previousPointerPos[POS_POINTER_2].set( actualSecondX , actualSecondY );
+
+                            distancePointers[DIST_1_TO_2].set(actualSecondX - actualFirstX, actualSecondY - actualFirstY);
+                            oldDistancePointers = distancePointers[DIST_1_TO_2].norm();
+                        }
                     }
+                    //Opcao de quando há 2 dedos na tela. Remove-se um e resta somente um dedo no touch.
+                    if (indexList == 0) {
+                        mPreviousPointerPos.set(
+                                event.getX(event.findPointerIndex(pointerID.get(1))) ,
+                                event.getY(event.findPointerIndex(pointerID.get(1))) );
+                    }
+                    pointerID.remove(indexList);
+                    ret = true;
                     break;
             }
             return ret;
