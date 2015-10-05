@@ -11,8 +11,10 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 
 public class Points {
     private static final String TAG = "Points";
@@ -51,6 +53,8 @@ public class Points {
     //private FloatBuffer vertexBuffer;
     //private ByteBuffer colorBuffer;
 
+    private boolean mPointCloudWithColor;
+    private float[] mRGB = new float[3];
     private ByteBuffer buffer;
     private ByteBuffer vertexBuffer;
     private ByteBuffer colorBuffer;
@@ -62,6 +66,7 @@ public class Points {
     private boolean mediumPointCalculated = false;
 
     public Points(){
+        mRGB[0] = 0.8f; mRGB[1] = 0.2f; mRGB[2] = 0.2f;
         // prepare shaders and OpenGL program
         int vertexShader = ShaderHelper.loadShader(GLES20.GL_VERTEX_SHADER,vertexShaderCode);
         int fragmentShader = ShaderHelper.loadShader(GLES20.GL_FRAGMENT_SHADER,fragmentShaderCode);
@@ -186,9 +191,11 @@ public class Points {
             loadVBO2();
         } else {
             GLES20.glDeleteBuffers(VBO.length, VBO, 0);
+            VBO = new int[1];
             loadVBO();
         }
-        mMediumPointThread.run();
+        mMediumPointThread = new MediumPoint();
+        mMediumPointThread.start();
         enable();
     }
 
@@ -202,17 +209,29 @@ public class Points {
                 try {
                     //DataInputStream data = new DataInputStream(new FileInputStream(file));
                     FileInputStream data = new FileInputStream(file);
+                    String magicNumber;
+                    byte[] magicNumberByte = new byte[4];
 
-                    int lengthFile = (int) file.length();
+                    int lengthFile = (int) (file.length()-5);
                     sizeBuffer = lengthFile;
-                    totalPoints = (lengthFile/15);
 
+                    data.read(magicNumberByte,0,4);
+                    magicNumber = new String(magicNumberByte);
+                    if(magicNumber.equals("PCl2")) {
+                        mPointCloudWithColor = true;
+                        totalPoints = (lengthFile/15);
+                    }else {
+                        mPointCloudWithColor = false;
+                        problemBufferInterleaved = false;
+                        totalPoints = (lengthFile/12);
+                    }
                     System.gc();
 
                     buffer = ByteBuffer.allocate(lengthFile);
                     //buffer.order(ByteOrder.BIG_ENDIAN);
                     buffer.order(ByteOrder.LITTLE_ENDIAN);
                     buffer.position(0);
+                    data.skip(1);
                     data.read(buffer.array(),0,lengthFile);
                     //data.readFully( buffer.array(),0,lengthFile );
 
@@ -262,8 +281,8 @@ public class Points {
         }
     }
 
-    // Separa o buffer (variavel buffer) em 2 buffers, colocando em um buffer os vertices e
-    // no outro buffer as cores.
+    // Separa o buffer (variavel byte[] buffer) em 2 buffers, colocando em um buffer os vertices
+    // (vertexBuffer) e em outro buffer as cores (colorBuffer).
     private void separateBuffers(){
         if(problemBufferInterleaved) {
             System.gc();
@@ -288,7 +307,8 @@ public class Points {
             GLES20.glUniformMatrix4fv(mMVPMatrix, 1, false, mvpMatrix, 0);
 
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,VBO[0]);
-
+        GLES20.glEnableVertexAttribArray(mPosition);
+        GLES20.glEnableVertexAttribArray(mColor);
         if(problemBufferInterleaved) {
             GLES20.glVertexAttribPointer(mPosition, 3, GLES20.GL_FLOAT, false, 0, 0);
             GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,VBO[1]);
@@ -297,14 +317,19 @@ public class Points {
             // Descobri que da erro no DrawArrays por causa de alguma
             // coisa que ocorre aqui no VertexAttribPointer. Não reconhece o stride '15', e tambem
             // nao reconhece stride que nao e multiplo de 4.
-            GLES20.glVertexAttribPointer(mPosition, 3, GLES20.GL_FLOAT, false, 15, 0);
-            GLES20.glVertexAttribPointer(mColor, 3, GLES20.GL_UNSIGNED_BYTE, true, 15, 12);
+            if(mPointCloudWithColor) {
+                GLES20.glVertexAttribPointer(mPosition, 3, GLES20.GL_FLOAT, false, 15, 0);
+                GLES20.glVertexAttribPointer(mColor, 3, GLES20.GL_UNSIGNED_BYTE, true, 15, 12);
+            }else {
+                GLES20.glDisableVertexAttribArray(mColor);
+                //Nao ha cor no arquivo escolhido, consequentemente, o buffer dos vertices
+                // sao diretos. Ha apenas 1 buffer para vertices. Nao ha "stride" no buffer.
+                GLES20.glVertexAttribPointer(mPosition, 3, GLES20.GL_FLOAT, false, 0, 0);
+                //GLES20.glVertexAttribPointer(mColor, 3, GLES20.GL_UNSIGNED_BYTE, true, 0, 0);
+                GLES20.glVertexAttrib3f(mColor, mRGB[0], mRGB[1], mRGB[2]);
+            }
         }
-
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,0);
-
-        GLES20.glEnableVertexAttribArray(mPosition);
-        GLES20.glEnableVertexAttribArray(mColor);
 
         GLES20.glDrawArrays(GLES20.GL_POINTS,0,totalPoints);
         if(!problemBufferInterleaved && GLES20.glGetError()==GLES20.GL_INVALID_OPERATION){
@@ -312,9 +337,7 @@ public class Points {
             separateBuffers();
             loadVBO2();
             draw(mvpModified,mvpMatrix);
-            return;
         }
-
         GLES20.glDisableVertexAttribArray(mPosition);
         GLES20.glDisableVertexAttribArray(mColor);
         GLES20.glUseProgram(0);
@@ -340,9 +363,15 @@ public class Points {
             minPoint.setY(maxPoint.getY());
             minPoint.setZ(maxPoint.getZ());
             for(int i=1; i<totalPoints; i++){
-                x = buffer.getFloat( i*15 );
-                y = buffer.getFloat((i*15)+4);
-                z = buffer.getFloat((i*15)+8);
+                if(mPointCloudWithColor) {
+                    x = buffer.getFloat(i * 15);
+                    y = buffer.getFloat((i * 15) + 4);
+                    z = buffer.getFloat((i * 15) + 8);
+                }else{
+                    x = buffer.getFloat(i * 12);
+                    y = buffer.getFloat((i * 12) + 4);
+                    z = buffer.getFloat((i * 12) + 8);
+                }
                 if( x>maxPoint.getX() ) maxPoint.setX(x);
                 if( y>maxPoint.getY() ) maxPoint.setY(y);
                 if( z>maxPoint.getZ() ) maxPoint.setZ(z);
