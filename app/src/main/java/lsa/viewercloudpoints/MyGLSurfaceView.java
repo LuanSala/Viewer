@@ -97,6 +97,7 @@ public class MyGLSurfaceView extends GLSurfaceView
                     break;
                 case MotionEvent.ACTION_UP:
                     pointerID.clear();
+                    mRenderer.getVirtualTrackball().pointerUp();
                     break;
             }
         } else
@@ -156,7 +157,6 @@ public class MyGLSurfaceView extends GLSurfaceView
                 distancePointers[i] = new VectorFloat(2);
         }
 
-        //@todo consertar erro que da quando há tres ponteiros (dedos) no touch.
         /**
          * Método responsável por capturar os dados dos ponteiros tocados no touch e detectar se
          * houve um gesto de movimento ou rotação.
@@ -299,7 +299,7 @@ public class MyGLSurfaceView extends GLSurfaceView
                 if (angle2 >= 155.0f && angle2 <= 180.0f)
                     if (angle1 >= 155.0f && angle1 <= 180.0f) {
                         if( Global.getViewingStyle()==Global.VIEW_USING_TRACKBALL )
-                            mRenderer.getVirtualTrackball().moveX((vectorDisplacPointer[DISPLAC_POINTER_2].getX())*speedMultiTouch);
+                            mRenderer.getVirtualTrackball().moveX((-vectorDisplacPointer[DISPLAC_POINTER_2].getX())*speedMultiTouch);
                         else
                             mRenderer.getCamera().moveX((vectorDisplacPointer[DISPLAC_POINTER_2].getX())*speedMultiTouch);
                         ret = true;
@@ -308,7 +308,7 @@ public class MyGLSurfaceView extends GLSurfaceView
                 if( angle2>=0.0f && angle2<=25.0f )
                     if( angle1>=0.0f && angle1<=25.0f ) {
                         if( Global.getViewingStyle()==Global.VIEW_USING_TRACKBALL )
-                            mRenderer.getVirtualTrackball().moveX((vectorDisplacPointer[DISPLAC_POINTER_2].getX())*speedMultiTouch);
+                            mRenderer.getVirtualTrackball().moveX((-vectorDisplacPointer[DISPLAC_POINTER_2].getX())*speedMultiTouch);
                         else
                             mRenderer.getCamera().moveX((vectorDisplacPointer[DISPLAC_POINTER_2].getX())*speedMultiTouch);
                         ret = true;
@@ -317,7 +317,7 @@ public class MyGLSurfaceView extends GLSurfaceView
                 if( angle2>=0.0f && angle2<=25.0f )
                     if( angle1>=0.0f && angle1<=25.0f ){
                         if( Global.getViewingStyle()==Global.VIEW_USING_TRACKBALL )
-                            mRenderer.getVirtualTrackball().moveY((-vectorDisplacPointer[DISPLAC_POINTER_2].getY())*speedMultiTouch);
+                            mRenderer.getVirtualTrackball().moveY((vectorDisplacPointer[DISPLAC_POINTER_2].getY())*speedMultiTouch);
                         else
                             mRenderer.getCamera().moveY((-vectorDisplacPointer[DISPLAC_POINTER_2].getY())*speedMultiTouch);
                         ret = true;
@@ -326,7 +326,7 @@ public class MyGLSurfaceView extends GLSurfaceView
                 if( angle2>=155.0f && angle2<=180.0f )
                     if( angle1>=155.0f && angle1<=180.0f ){
                         if( Global.getViewingStyle()==Global.VIEW_USING_TRACKBALL )
-                            mRenderer.getVirtualTrackball().moveY((-vectorDisplacPointer[DISPLAC_POINTER_2].getY())*speedMultiTouch);
+                            mRenderer.getVirtualTrackball().moveY((vectorDisplacPointer[DISPLAC_POINTER_2].getY())*speedMultiTouch);
                         else
                             mRenderer.getCamera().moveY((-vectorDisplacPointer[DISPLAC_POINTER_2].getY())*speedMultiTouch);
                         ret = true;
