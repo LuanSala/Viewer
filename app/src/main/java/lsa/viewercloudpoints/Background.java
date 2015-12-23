@@ -1,4 +1,3 @@
-
 package lsa.viewercloudpoints;
 
 import android.opengl.GLES20;
