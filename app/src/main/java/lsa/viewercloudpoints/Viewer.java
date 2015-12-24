@@ -4,11 +4,12 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import lsa.viewercloudpoints.filechooser.FileChooser;
 import lsa.viewercloudpoints.navigation_drawer.MovementSpeedPreference;
@@ -49,10 +50,26 @@ public class Viewer extends Activity
         //Point p = new Point();
         //getWindowManager().getDefaultDisplay().getSize(p);
         //System.out.println("Size = "+p.x+" "+p.y);
+
+        findViewById(R.id.Button_exit_application).setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Toast.makeText(getApplicationContext(), "Sair do aplicativo", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
+        findViewById(R.id.Button_open_file_nav_drawer).setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Toast.makeText(getApplicationContext(), "Abrir um novo arquivo", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
     }
 
     public void openFileChooser(View view){
         Intent render = new Intent(this,FileChooser.class);
+        drawerLayout.closeDrawer(findViewById(R.id.linear_layout_drawerLayout));
         this.startActivityForResult(render,Global.PICK_FILE);
     }
 
@@ -79,6 +96,10 @@ public class Viewer extends Activity
             builder.setNegativeButton(R.string.negativeButton_dialog_backButton_exit, this);
             builder.show();
         }
+    }
+
+    public void exitApplication(View view) {
+        super.onBackPressed();
     }
 
     public void onClick(DialogInterface dialog, int which) {

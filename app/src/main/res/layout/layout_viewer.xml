@@ -42,13 +42,26 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/Button_open_file_nav_drawer"
-                android:layout_width="fill_parent"
+                android:id="@+id/Button_exit_application"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Abrir arquivo"
+                android:layout_weight="50"
+                android:text="Sair"
                 android:textColor="@color/abc_primary_text_material_light"
                 android:textSize="12sp"
-                android:drawableTop="@drawable/ic_action_storage"
+                android:drawableTop="@drawable/ic_exit_to_app_black_24dp"
+                android:textIsSelectable="false"
+                android:onClick="exitApplication"/>
+
+            <Button
+                android:id="@+id/Button_open_file_nav_drawer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="50"
+                android:text="Abrir"
+                android:textColor="@color/abc_primary_text_material_light"
+                android:textSize="12sp"
+                android:drawableTop="@drawable/ic_storage_black_24dp"
                 android:textIsSelectable="false"
                 android:onClick="openFileChooser"/>
 
