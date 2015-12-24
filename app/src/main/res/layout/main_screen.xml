@@ -14,7 +14,7 @@
             android:layout_height="wrap_content"
             android:text="@string/new_file"
             android:id="@+id/button"
-            android:drawableLeft="@drawable/ic_action_storage"
+            android:drawableLeft="@drawable/ic_storage_black_24dp"
             android:textColor="@color/abc_primary_text_material_dark"
             android:textAllCaps="false"
             android:textIsSelectable="false"
