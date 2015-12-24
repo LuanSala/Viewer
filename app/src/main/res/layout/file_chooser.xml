@@ -23,22 +23,13 @@
             android:nestedScrollingEnabled="false">
 
             <Button
-                android:layout_width="0dp"
+                android:layout_width="fill_parent"
                 android:layout_height="match_parent"
                 android:text="CANCEL"
                 android:id="@+id/button1"
-                android:layout_weight="50"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="3dp"  />
 
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:text="GO"
-                android:id="@+id/button2"
-                android:layout_weight="50"
-                android:layout_marginRight="5dp"
-                android:layout_marginLeft="3dp" />
         </LinearLayout>
 
     </LinearLayout>
