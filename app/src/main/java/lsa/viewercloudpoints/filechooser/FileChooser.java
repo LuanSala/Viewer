@@ -2,6 +2,9 @@ package lsa.viewercloudpoints.filechooser;
 
 import lsa.viewercloudpoints.R;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -24,7 +27,8 @@ import java.util.List;
 /**
  * Created by Luan Sala on 05/03/2015.
  */
-public class FileChooser extends ActionBarActivity {
+public class FileChooser extends ActionBarActivity
+        implements DialogInterface.OnClickListener, DialogInterface.OnDismissListener{
     private static final String TAG = "FileChooser";
 
     //STATES para a recuperacao dos dados no ciclo de vida do FileChooser.
@@ -60,7 +64,6 @@ public class FileChooser extends ActionBarActivity {
         setContentView(R.layout.file_chooser);
         listView = (ListView) findViewById(R.id.listView);
         button1 = (Button) findViewById(R.id.button1);
-        button2 = (Button) findViewById(R.id.button2);
         fillListView(currentDirectory);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -73,15 +76,30 @@ public class FileChooser extends ActionBarActivity {
                     nextDir = new File(currentDirectory, arrayAdapter.getItem(position).getName());
                 if (nextDir.isDirectory()) {
                     currentDirectory = nextDir;
-                    button2.setText("GO");
                     isFileSelected = false;
                     try {
                         fillListView(currentDirectory.getCanonicalFile());
                     }catch(IOException e){ e.printStackTrace(); }
                 } else {
-                    button2.setText(arrayAdapter.getItem(position).getName());
                     fileSelected = nextDir.getAbsolutePath();
-                    isFileSelected = true;
+                    try {
+                        FileInputStream file = new FileInputStream(fileSelected);
+                        byte[] numberMagicBytes = new byte[4];
+                        String numberMagic;
+                        file.read(numberMagicBytes,0,4);
+                        numberMagic = new String(numberMagicBytes);
+                        file.close();
+
+                        if(numberMagic.equals("PCl1") || numberMagic.equals("PCl2")) {
+                            isFileSelected = true;
+                            //Nome do arquivo passado como parâmetro.
+                            buildOpenFileDialog( arrayAdapter.getItem(position).getName() );
+                        } else
+                            Toast.makeText(getApplicationContext(),getString(R.string.message_open_file_not_valid),Toast.LENGTH_LONG).show();
+                    } catch(IOException e){
+                        Toast.makeText(getApplicationContext(),getString(R.string.message_open_file_not_valid),Toast.LENGTH_LONG).show();
+                        //e.printStackTrace();
+                    }
                 }
             }
         });
@@ -90,7 +108,6 @@ public class FileChooser extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 if( !currentDirectory.getAbsolutePath().equals(File.separator) ) {
-                    button2.setText("GO");
                     isFileSelected = false;
                     currentDirectory = currentDirectory.getParentFile();
                     fillListView(currentDirectory);
@@ -100,33 +117,40 @@ public class FileChooser extends ActionBarActivity {
                 }
             }
         });
+    }
 
+    public void buildOpenFileDialog(String fileName){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        String string = getString(R.string.message_dialog_open_file);
 
-        button2.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if( isFileSelected ) {
-                    try {
-                        FileInputStream file = new FileInputStream(fileSelected);
-                        byte[] numberMagicBytes = new byte[4];
-                        String numberMagic;
-                        file.read(numberMagicBytes,0,4);
-                        numberMagic = new String(numberMagicBytes);
-                        file.close();
-                        if(numberMagic.equals("PCl1") || numberMagic.equals("PCl2")) {
-                            Intent intent = new Intent();
-                            intent.putExtra("fileSelected",fileSelected);
-                            setResult(ActionBarActivity.RESULT_OK,intent);
-                            finish();
-                        }else
-                            Toast.makeText(getApplicationContext(),"File is not valid!",Toast.LENGTH_LONG).show();
-                    } catch(IOException e){
-                        Toast.makeText(getApplicationContext(),"File is not valid!",Toast.LENGTH_LONG).show();
-                        //e.printStackTrace();
-                    }
-                }
-            }
-        });
+        //Pega o nome do arquivo escolhido e põe no meio da mensagem a ser mostrada para o usuário.
+        builder.setMessage(string + " \"" + fileName + "\"?");
+        builder.setTitle(R.string.title_dialog_open_file);
+        //Configura a ação a ser tomada caso o diálogo seja fechado por qualquer motivo.
+        builder.setOnDismissListener(this);
+        //Configura a ação do botão positivo ao ser apertado.
+        builder.setPositiveButton(R.string.positiveButton_dialog_open_file, this);
+        //Configura a ação do botão negativo ao ser apertado.
+        builder.setNegativeButton(R.string.negativeButton_dialog_open_file, this);
+        builder.show();
+    }
+
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+        if(which==DialogInterface.BUTTON_POSITIVE) {
+            //Fecha o File Chooser com o arquivo escolhido sendo mandado para o Viewer
+            // para ser visualizado a nuvem de pontos.
+            Intent intent = new Intent();
+            intent.putExtra("fileSelected", fileSelected);
+            setResult(ActionBarActivity.RESULT_OK, intent);
+            finish();
+        }else if( which==DialogInterface.BUTTON_NEGATIVE)
+            isFileSelected = false;
+    }
+
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        isFileSelected = false;
     }
 
     @Override
@@ -141,7 +165,7 @@ public class FileChooser extends ActionBarActivity {
     protected void onResume() {
         super.onResume();
         if(isFileSelected)
-            button2.setText( new File(fileSelected).getName() );
+            buildOpenFileDialog(new File(fileSelected).getName());
     }
 
     // Aqui você preenche a ActionBar colocando os botões desejados.

@@ -80,6 +80,7 @@ public class Viewer extends Activity
                 Global.file = data.getStringExtra("fileSelected");
                 ((MyGLRenderer)mGLView.getRenderer()).updatePoints();
                 mGLView.requestRender();
+                drawerLayout.closeDrawer(findViewById(R.id.linear_layout_drawerLayout));
             }
         }
     }

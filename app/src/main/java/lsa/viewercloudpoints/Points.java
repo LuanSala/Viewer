@@ -179,9 +179,13 @@ public class Points {
     }*/
 
     public void update(){
-        buffer.limit(0);
-        buffer = null;
+        if(buffer!=null) {
+            buffer.limit(0);
+            buffer = null;
+        }
         initSomePoints();
+        mMediumPointThread = new MediumPoint();
+        mMediumPointThread.start();
         if( problemBufferInterleaved ) {
             vertexBuffer.limit(0);
             vertexBuffer = null;
@@ -194,8 +198,6 @@ public class Points {
             VBO = new int[1];
             loadVBO();
         }
-        mMediumPointThread = new MediumPoint();
-        mMediumPointThread.start();
         enable();
     }
 
@@ -218,9 +220,11 @@ public class Points {
                     data.read(magicNumberByte,0,4);
                     magicNumber = new String(magicNumberByte);
                     if(magicNumber.equals("PCl2")) {
+                        //Log.d(TAG,"Magic Number = PCL2");
                         mPointCloudWithColor = true;
                         totalPoints = (lengthFile/15);
                     }else {
+                        //Log.d(TAG,"Magic Number = PCL1");
                         mPointCloudWithColor = false;
                         problemBufferInterleaved = false;
                         totalPoints = (lengthFile/12);
@@ -231,7 +235,7 @@ public class Points {
                     //buffer.order(ByteOrder.BIG_ENDIAN);
                     buffer.order(ByteOrder.LITTLE_ENDIAN);
                     buffer.position(0);
-                    data.skip(1);
+                    data.skip(1); //pula o '\n' depois do número mágico
                     data.read(buffer.array(),0,lengthFile);
                     //data.readFully( buffer.array(),0,lengthFile );
 
@@ -278,6 +282,8 @@ public class Points {
             GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, colorBuffer.array().length,
                     colorBuffer.position(0), GLES20.GL_STATIC_DRAW);
             GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+            buffer.limit(0);
+            buffer = null;
         }
     }
 
@@ -333,6 +339,7 @@ public class Points {
 
         GLES20.glDrawArrays(GLES20.GL_POINTS,0,totalPoints);
         if(!problemBufferInterleaved && GLES20.glGetError()==GLES20.GL_INVALID_OPERATION){
+            //Log.d(TAG,"Problem in buffer");
             problemBufferInterleaved = true;
             separateBuffers();
             loadVBO2();
