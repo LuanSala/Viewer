@@ -20,7 +20,9 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     private final float[] mProjectionMatrix = new float[16];
     private VirtualTrackball virtualTrackball;
     private Camera camera;
+    private Background background;
 
+    private VectorFloat centerTrackball;
     private Points mPoints;
     private boolean updatePoints;
     private boolean MVPModified;
@@ -71,6 +73,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
                 GLES20.glDisable(GLES20.GL_BLEND);
                 break;
             case Global.STATE_RENDER_POINTS:
+                background.draw();
                 if(mPoints.isEnabled()) {
                     if (MVPModified) {
                         if (Global.getViewingStyle() == Global.VIEW_USING_TRACKBALL) {
@@ -117,6 +120,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         //Matrix.setIdentityM( mProjectionMatrix,0 );
         Matrix.perspectiveM( mProjectionMatrix,0,60.0f,ratio,0.06f,20000.0f);
 
+        background.update(mProjectionMatrix);
         virtualTrackball.updateWindowSize();
         //fileButton.setModelViewMatrix();
         MVPModified = true;
@@ -125,6 +129,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
         //Log.d(TAG,"SurfaceCreated");
         virtualTrackball = new VirtualTrackball();
+        background = new Background();
         camera = new Camera();
         camera.moveX(5f);
         camera.moveZ(20f);
