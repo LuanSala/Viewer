@@ -40,14 +40,7 @@ public class FileChooser extends ActionBarActivity
     private boolean isFileSelected;
     private File currentDirectory;
     private ListView listView;
-    /**
-     * Botao que volta uma pasta ou fecha o FileChooser
-     */
-    private Button button1;
-    /**
-     * Botao que escolhe o arquivo selecionado
-     */
-    private Button button2;
+
     private MyArrayAdapter<OptionFile> arrayAdapter;
 
     public void onCreate(Bundle savedInstanceState) {
@@ -63,7 +56,6 @@ public class FileChooser extends ActionBarActivity
             currentDirectory = new File(File.separator);
         setContentView(R.layout.file_chooser);
         listView = (ListView) findViewById(R.id.listView);
-        button1 = (Button) findViewById(R.id.button1);
         fillListView(currentDirectory);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -103,20 +95,6 @@ public class FileChooser extends ActionBarActivity
                 }
             }
         });
-
-        button1.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if( !currentDirectory.getAbsolutePath().equals(File.separator) ) {
-                    isFileSelected = false;
-                    currentDirectory = currentDirectory.getParentFile();
-                    fillListView(currentDirectory);
-                } else {
-                    setResult(ActionBarActivity.RESULT_CANCELED);
-                    finish();
-                }
-            }
-        });
     }
 
     public void buildOpenFileDialog(String fileName){
@@ -151,6 +129,18 @@ public class FileChooser extends ActionBarActivity
     @Override
     public void onDismiss(DialogInterface dialog) {
         isFileSelected = false;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if( !currentDirectory.getAbsolutePath().equals(File.separator) ) {
+            isFileSelected = false;
+            currentDirectory = currentDirectory.getParentFile();
+            fillListView(currentDirectory);
+        } else {
+            setResult(ActionBarActivity.RESULT_CANCELED);
+            finish();
+        }
     }
 
     @Override
@@ -200,9 +190,7 @@ public class FileChooser extends ActionBarActivity
         if( !file.getAbsolutePath().equals(File.separator) ) {
             //list.add(0, "..Parent Directory..");
             list.add( 0, new OptionFile("Parent Directory","..",false) );
-            button1.setText("BACK");
-        } else
-            button1.setText("CANCEL");
+        }
         //arrayAdapter = new ArrayAdapter<>(FileChooser.this, android.R.layout.simple_list_item_1, list);
         arrayAdapter = new MyArrayAdapter<OptionFile>(FileChooser.this, R.layout.file_view, list);
         listView.setAdapter(arrayAdapter);
