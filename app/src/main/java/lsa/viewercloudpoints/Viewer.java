@@ -69,7 +69,7 @@ public class Viewer extends Activity
 
         PreferenceFragment preferenceFragment;
         preferenceFragment = (PreferenceFragment)getFragmentManager().findFragmentByTag(getString(R.string.nav_drawer_TAG));
-        switchFullScreen = (SwitchPreference)preferenceFragment.findPreference(getString(R.string.key_full_screen));
+        switchFullscreen = (SwitchPreference)preferenceFragment.findPreference(getString(R.string.key_full_screen));
     }
 
     public void openFileChooser(View view){
@@ -88,11 +88,6 @@ public class Viewer extends Activity
                 drawerLayout.closeDrawer(findViewById(R.id.linear_layout_drawerLayout));
             }
         }
-        if( switchFullScreen.isChecked() )
-            getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
-                    View.SYSTEM_UI_FLAG_FULLSCREEN |
-                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY );
     }
 
     @Override
@@ -118,6 +113,17 @@ public class Viewer extends Activity
             super.onBackPressed();
     }
 
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if(hasFocus)
+            if(switchFullscreen.isChecked())
+                getWindow().getDecorView().setSystemUiVisibility(
+                        View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+                                View.SYSTEM_UI_FLAG_FULLSCREEN |
+                                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY );
+    }
+
     //@TODO: configurar apropriadamente os métodos de saida do aplicativo nas classes corretas.
 
     @Override
@@ -125,8 +131,9 @@ public class Viewer extends Activity
         super.onDestroy();
         if(global!=null) global.destroy();
     }
+
     //Variável utilizada para chegar quando o modo FullScreen está ativado ou não.
-    SwitchPreference switchFullScreen;
+    SwitchPreference switchFullscreen;
 }
 
 

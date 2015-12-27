@@ -23,15 +23,15 @@
         android:layout_height="match_parent"
         android:layout_gravity="start|left"
         android:id="@+id/linear_layout_drawerLayout"
-        android:background="@color/background_material_light"
-        android:fitsSystemWindows="true">
+        android:background="@color/background_material_light">
 
         <fragment android:name="lsa.viewercloudpoints.navigation_drawer.NavigationDrawerFragment"
             android:id="@+id/fragment"
             android:tag="@string/nav_drawer_TAG"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@+id/layout_buttons_in_bottom_nav_drawer"/>
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_above="@+id/layout_buttons_in_bottom_nav_drawer"
+            android:layout_marginTop="16dp"/>
 
         <LinearLayout
             android:id="@+id/layout_buttons_in_bottom_nav_drawer"

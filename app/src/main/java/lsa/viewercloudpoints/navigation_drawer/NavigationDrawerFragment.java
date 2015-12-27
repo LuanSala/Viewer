@@ -30,7 +30,6 @@ public class NavigationDrawerFragment extends PreferenceFragment
 
         findPreference(getString(R.string.key_mode_vision)).setOnPreferenceChangeListener(this);
         findPreference(getString(R.string.key_full_screen)).setOnPreferenceChangeListener(this);
-        //findPreference(getString(R.string.key_mov_speed)).setOnPreferenceChangeListener(this);
 
         centerCloud = (SwitchPreference)findPreference(getString(R.string.key_center_trackball));
         centerCloud.setOnPreferenceChangeListener(this);
@@ -51,22 +50,20 @@ public class NavigationDrawerFragment extends PreferenceFragment
             }
             ((DrawerLayout) getActivity().findViewById(R.id.drawerLayout)).closeDrawer(
                     getActivity().findViewById(R.id.linear_layout_drawerLayout));
-        }
-        if( preference.getKey().equals(getString(R.string.key_center_trackball)) ){
+        } else if( preference.getKey().equals(getString(R.string.key_center_trackball)) ) {
             synchronized (this){
                 Global.useTrackballCentered((boolean)newValue);
                 notifyAll();
             }
             ((DrawerLayout) getActivity().findViewById(R.id.drawerLayout)).closeDrawer(
                     getActivity().findViewById(R.id.linear_layout_drawerLayout));
-        }
-        if( preference.getKey().equals(getString(R.string.key_full_screen)) ) {
+        } else if( preference.getKey().equals(getString(R.string.key_full_screen)) ) {
             if(newValue.equals(true)) {
                 //getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 getActivity().getWindow().getDecorView().setSystemUiVisibility(
                         View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
-                        View.SYSTEM_UI_FLAG_FULLSCREEN |
-                        View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY );
+                                View.SYSTEM_UI_FLAG_FULLSCREEN |
+                                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY );
             } else {
                 //getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
