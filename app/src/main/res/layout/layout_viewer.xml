@@ -43,10 +43,10 @@
 
             <Button
                 android:id="@+id/Button_exit_application"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="50"
-                android:text="Sair"
+                android:text="@string/button_text_exit"
                 android:textColor="@color/abc_primary_text_material_light"
                 android:textSize="12sp"
                 android:drawableTop="@drawable/ic_exit_to_app_black_24dp"
@@ -55,10 +55,10 @@
 
             <Button
                 android:id="@+id/Button_open_file_nav_drawer"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="50"
-                android:text="Abrir"
+                android:text="@string/button_text_open_file"
                 android:textColor="@color/abc_primary_text_material_light"
                 android:textSize="12sp"
                 android:drawableTop="@drawable/ic_storage_black_24dp"

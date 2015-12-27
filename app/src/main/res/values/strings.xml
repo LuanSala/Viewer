@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
+
     <string name="app_name">3D CloudPoints</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -24,6 +24,17 @@
     <string name="message_dialog_backButton_exit">Deseja encerrar o aplicativo?</string>
     <string name="title_dialog_backButton_exit">Sair</string>
     <string name="positiveButton_dialog_backButton_exit">Sim</string>
-    <string name="negativeButton_dialog_backButton_exit">Nao</string>
+    <string name="negativeButton_dialog_backButton_exit">Não</string>
+
+    <!-- Valores utilizados no File Chooser -->
+    <string name="message_open_file_not_valid">Arquivo não é válido!</string>
+    <string name="title_dialog_open_file">Arquivo válido!</string>
+    <string name="message_dialog_open_file">Deseja abrir o arquivo</string>
+    <string name="positiveButton_dialog_open_file">Sim</string>
+    <string name="negativeButton_dialog_open_file">Não</string>
+
+    <!-- Valores apresentados na navigation drawer -->
+    <string name="button_text_exit">Sair</string>
+    <string name="button_text_open_file">Abrir arquivo</string>
 
 </resources>

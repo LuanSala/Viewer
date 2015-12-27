@@ -62,11 +62,13 @@ public class NavigationDrawerFragment extends PreferenceFragment
         }
         if( preference.getKey().equals(getString(R.string.key_full_screen)) ) {
             if(newValue.equals(true)) {
-                getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                //getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 getActivity().getWindow().getDecorView().setSystemUiVisibility(
-                        View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY );
-            }else {
-                getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                        View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+                        View.SYSTEM_UI_FLAG_FULLSCREEN |
+                        View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY );
+            } else {
+                //getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
             }
         }
