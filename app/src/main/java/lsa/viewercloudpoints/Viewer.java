@@ -1,7 +1,6 @@
 package lsa.viewercloudpoints;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -81,7 +80,11 @@ public class Viewer extends Activity
     }
 
     public void exitApplication(View view) {
-        super.onBackPressed();
+        Intent exit = new Intent(this,MainScreen.class);
+        exit.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        exit.putExtra("EXIT",true);
+        startActivity(exit);
+        finish();
     }
 
     @Override
