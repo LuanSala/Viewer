@@ -73,9 +73,15 @@ public class Viewer extends Activity
     }
 
     public void openFileChooser(View view){
-        Intent render = new Intent(this,FileChooser.class);
         drawerLayout.closeDrawer(findViewById(R.id.linear_layout_drawerLayout));
-        this.startActivityForResult(render,Global.PICK_FILE);
+        Intent render = new Intent(this,FileChooser.class);
+        boolean[] bool = {true};
+        render.putExtra(getString(R.string.isActivityForResult), bool);
+        startActivityForResult(render, Global.PICK_FILE);
+    }
+
+    public void exitApplication(View view) {
+        super.onBackPressed();
     }
 
     @Override
@@ -94,18 +100,8 @@ public class Viewer extends Activity
     public void onBackPressed() {
         if( drawerLayout.isDrawerOpen(findViewById(R.id.linear_layout_drawerLayout)) )
             drawerLayout.closeDrawer(findViewById(R.id.linear_layout_drawerLayout));
-        else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage(R.string.message_dialog_backButton_exit)
-                    .setTitle(R.string.title_dialog_backButton_exit);
-            builder.setPositiveButton(R.string.positiveButton_dialog_backButton_exit, this);
-            builder.setNegativeButton(R.string.negativeButton_dialog_backButton_exit, this);
-            builder.show();
-        }
-    }
-
-    public void exitApplication(View view) {
-        super.onBackPressed();
+        else
+            super.onBackPressed();
     }
 
     public void onClick(DialogInterface dialog, int which) {

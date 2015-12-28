@@ -1,6 +1,8 @@
 package lsa.viewercloudpoints.filechooser;
 
+import lsa.viewercloudpoints.Global;
 import lsa.viewercloudpoints.R;
+import lsa.viewercloudpoints.Viewer;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -48,15 +50,19 @@ public class FileChooser extends ActionBarActivity
         if(savedInstanceState!=null) {
             currentDirectory = new File(savedInstanceState.getString(STATE_CURRENT_DIRECTORY, File.separator));
             String file = savedInstanceState.getString(STATE_FILE_SELECTED);
-            if(file!=null){
+            if (file != null) {
                 isFileSelected = true;
                 fileSelected = file;
             }
-        }else
+        } else
             currentDirectory = new File(File.separator);
         setContentView(R.layout.file_chooser);
         listView = (ListView) findViewById(R.id.listView);
         fillListView(currentDirectory);
+
+        boolean[] bool = getIntent().getBooleanArrayExtra(getString(R.string.isActivityForResult));
+        if(bool!=null)
+            isActivityForResult = bool[0];
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -118,11 +124,16 @@ public class FileChooser extends ActionBarActivity
         if(which==DialogInterface.BUTTON_POSITIVE) {
             //Fecha o File Chooser com o arquivo escolhido sendo mandado para o Viewer
             // para ser visualizado a nuvem de pontos.
-            Intent intent = new Intent();
-            intent.putExtra("fileSelected", fileSelected);
-            setResult(ActionBarActivity.RESULT_OK, intent);
-            finish();
-        }else if( which==DialogInterface.BUTTON_NEGATIVE)
+            if( isActivityForResult ) {
+                Intent intent = new Intent();
+                intent.putExtra("fileSelected", fileSelected);
+                setResult(ActionBarActivity.RESULT_OK, intent);
+                finish();
+            } else {
+                Global.file = fileSelected;
+                startActivity(new Intent(this, Viewer.class));
+            }
+        } else if( which==DialogInterface.BUTTON_NEGATIVE)
             isFileSelected = false;
     }
 
@@ -195,5 +206,8 @@ public class FileChooser extends ActionBarActivity
         arrayAdapter = new MyArrayAdapter<OptionFile>(FileChooser.this, R.layout.file_view, list);
         listView.setAdapter(arrayAdapter);
     }
+
+
+    private boolean isActivityForResult = false;
 
 }

@@ -22,7 +22,8 @@ public class MainScreen extends Activity {
 
     public void openFileChooser(View view){
         Intent render = new Intent(this,FileChooser.class);
-        this.startActivityForResult(render,Global.PICK_FILE);
+        //this.startActivityForResult(render,Global.PICK_FILE);
+        startActivity(render);
     }
 
     @Override
@@ -30,8 +31,8 @@ public class MainScreen extends Activity {
         if( requestCode==Global.PICK_FILE ){
             if( resultCode==RESULT_OK ){
                 Global.file = data.getStringExtra("fileSelected");
-                this.startActivity(new Intent(this,Viewer.class));
-                this.finish();
+                startActivity(new Intent(this,Viewer.class));
+                finish();
             }
         }
     }
