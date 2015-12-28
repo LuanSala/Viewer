@@ -46,13 +46,15 @@ public class ShaderHelper {
         return program;
     }
 
+    //Imprime o log de informação de um determinado shader especificado em 'sh' e o seu tipo (VERTEX_SHADER
+    // ou FRAGMENT_SHADER).
     private static void printShaderInfoLog(int sh,int type){
         String infoLog = GLES20.glGetShaderInfoLog(sh);
         Log.e(TAG, "Problem in Shader Code - "+
                 ((type==GLES20.GL_VERTEX_SHADER)?"GL_VERTEX_SHADER":"GL_FRAGMENT_SHADER")+
                 "\n"+infoLog);
     }
-
+    //Imprime o log de informação do programa shader compilado.
     public static void printProgramInfoLog(int pr){
         String infoLog = GLES20.glGetProgramInfoLog(pr);
         Log.e(TAG, "Problem in Shader Program:\n"+infoLog);
