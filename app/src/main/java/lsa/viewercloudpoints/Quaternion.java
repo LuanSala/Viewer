@@ -47,6 +47,11 @@ public class Quaternion {
         z = v.getZ();
     }
 
+    public float[] getFloatArray() {
+        float[] floatArray = {s,x,y,z};
+        return floatArray;
+    }
+
     public float getReal(){
         return s;
     }
@@ -68,6 +73,13 @@ public class Quaternion {
         x = q.x;
         y = q.y;
         z = q.z;
+    }
+
+    public void set(float scalar, float x, float y, float z){
+        s = scalar;
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
 
     static public Quaternion getRotationIdentity(){

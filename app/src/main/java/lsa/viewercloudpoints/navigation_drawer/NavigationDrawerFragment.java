@@ -1,6 +1,7 @@
 package lsa.viewercloudpoints.navigation_drawer;
 
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.SwitchPreference;
@@ -21,6 +22,7 @@ public class NavigationDrawerFragment extends PreferenceFragment
     private static final String TAG = "NavigationDrawerFragment";
 
     private SwitchPreference centerCloud;
+    private ListPreference modeVision;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -28,7 +30,8 @@ public class NavigationDrawerFragment extends PreferenceFragment
 
         addPreferencesFromResource(R.xml.preference_nav_drawer);
 
-        findPreference(getString(R.string.key_mode_vision)).setOnPreferenceChangeListener(this);
+        modeVision = (ListPreference)findPreference(getString(R.string.key_mode_vision));
+        modeVision.setOnPreferenceChangeListener(this);
         findPreference(getString(R.string.key_full_screen)).setOnPreferenceChangeListener(this);
 
         centerCloud = (SwitchPreference)findPreference(getString(R.string.key_center_trackball));
@@ -70,6 +73,22 @@ public class NavigationDrawerFragment extends PreferenceFragment
             }
         }
         return true;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        synchronized (this) {
+            if (modeVision.getValue() == getString(R.string.value_mode_virtual_trackball)) {
+                centerCloud.setEnabled(true);
+                Global.setViewingStyle(Global.VIEW_USING_TRACKBALL);
+            } else {
+                centerCloud.setEnabled(false);
+                Global.setViewingStyle(Global.VIEW_USING_CAMERA);
+            }
+            Global.useTrackballCentered( centerCloud.isChecked() );
+            notifyAll();
+        }
     }
 
     @Override

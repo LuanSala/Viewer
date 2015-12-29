@@ -10,6 +10,7 @@ import javax.microedition.khronos.opengles.GL10;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
+import android.os.Bundle;
 import android.util.Log;
 
 public class MyGLRenderer implements GLSurfaceView.Renderer {
@@ -41,6 +42,16 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     public MyGLRenderer() {
         mTranslucentBackground = true;
         MVPModified = true;
+    }
+
+    public MyGLRenderer(Bundle savedInstanceState) {
+        mTranslucentBackground = true;
+        MVPModified = true;
+
+        float[] floatArray = savedInstanceState.getFloatArray(Global.getContext().getString(R.string.key_save_virtual_trackball));
+        virtualTrackball = new VirtualTrackball(floatArray);
+        floatArray = savedInstanceState.getFloatArray(Global.getContext().getString(R.string.key_save_camera));
+        camera = new Camera(floatArray);
     }
 
     public Camera getCamera(){
@@ -128,11 +139,14 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
         //Log.d(TAG,"SurfaceCreated");
-        virtualTrackball = new VirtualTrackball();
         background = new Background();
-        camera = new Camera();
-        camera.moveX(5f);
-        camera.moveZ(20f);
+        if (virtualTrackball==null)
+            virtualTrackball = new VirtualTrackball();
+        if (camera==null) {
+            camera = new Camera();
+            camera.moveX(5f);
+            camera.moveZ(20f);
+        }
         refreshMVP();
 
         //createFrameBuffer();

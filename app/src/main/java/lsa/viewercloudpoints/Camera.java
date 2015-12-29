@@ -25,6 +25,36 @@ public class Camera {
         loadViewIdentity();
     }
 
+    public Camera(float[] floatArray){
+        rotation = new Quaternion(floatArray[0],floatArray[1],floatArray[2],floatArray[3]);
+        up = new Quaternion(floatArray[4],floatArray[5],floatArray[6],floatArray[7]);
+        axisX = new Quaternion(floatArray[8],floatArray[9],floatArray[10],floatArray[11]);
+        displacement = new float[3];
+        displacement[0] = floatArray[12];
+        displacement[1] = floatArray[13];
+        displacement[2] = floatArray[14];
+        mViewMatrix = new float[16];
+        System.arraycopy(rotation.getMatrix(),0,tempViewMatrix,0,16);
+        applyTranslate();
+    }
+
+    //Função que retorna os valores do estado atual da câmera.
+    // floatArray[0,1,2,3] = rotation quaternion
+    // floatArray[4,5,6,7] = up quaternion
+    // floatArray[8,9,10,11] = axisX quaternion
+    // floatArray[12,13,14] = displacement
+    public float[] getForSaveInstanceState(){
+        float[] rot = rotation.getFloatArray();
+        float[] up = this.up.getFloatArray();
+        float[] aX = axisX.getFloatArray();
+        return new float[]{
+                rot[0], rot[1], rot[2], rot[3],
+                up[0], up[1], up[2], up[3],
+                aX[0], aX[1], aX[2], aX[3],
+                displacement[0], displacement[1], displacement[2]
+        };
+    }
+
     public float[] getDisplacement(){
         return displacement;
     }
@@ -38,7 +68,8 @@ public class Camera {
         mViewMatrix[ 4]=0f; mViewMatrix[ 5]=1f; mViewMatrix[ 6]=0f; mViewMatrix[ 7]=0f;
         mViewMatrix[ 8]=0f; mViewMatrix[ 9]=0f; mViewMatrix[10]=1f; mViewMatrix[11]=0f;
         mViewMatrix[12]=0f; mViewMatrix[13]=0f; mViewMatrix[14]=0f; mViewMatrix[15]=1f;
-        tempViewMatrix = mViewMatrix;
+        System.arraycopy(mViewMatrix,0,tempViewMatrix,0,16);
+        //tempViewMatrix = mViewMatrix;
     }
 
     public void joinRotation(Quaternion q){
@@ -46,7 +77,8 @@ public class Camera {
     }
 
     public void moveX(float dx){
-        tempViewMatrix = rotation.getMatrix();
+        System.arraycopy(rotation.getMatrix(),0,tempViewMatrix,0,16);
+        //tempViewMatrix = rotation.getMatrix();
         Quaternion displac = new Quaternion(0,-dx,0,0);
         displac.set( rotation.mult(displac).mult(rotation.conjugate()) );
         displacement[0] += displac.getX();
@@ -56,7 +88,8 @@ public class Camera {
     }
 
     public void moveY(float dy){
-        tempViewMatrix = rotation.getMatrix();
+        System.arraycopy(rotation.getMatrix(),0,tempViewMatrix,0,16);
+        ///tempViewMatrix = rotation.getMatrix();
         Quaternion displac = new Quaternion(0,0,-dy,0);
         displac.set( rotation.mult(displac).mult(rotation.conjugate()) );
         displacement[0] += displac.getX();
@@ -66,7 +99,8 @@ public class Camera {
     }
 
     public void moveZ(float dz){
-        tempViewMatrix = rotation.getMatrix();
+        System.arraycopy(rotation.getMatrix(),0,tempViewMatrix,0,16);
+        //tempViewMatrix = rotation.getMatrix();
         Quaternion displac = new Quaternion(0,0,0,-dz);
         displac.set( rotation.mult(displac).mult(rotation.conjugate()) );
         displacement[0] += displac.getX();
@@ -97,7 +131,8 @@ public class Camera {
             rotation.normalize();
         }else countUpdateRotation++;
 
-        tempViewMatrix = rotation.getMatrix();
+        System.arraycopy(rotation.getMatrix(),0,tempViewMatrix,0,16);
+        //tempViewMatrix = rotation.getMatrix();
         applyTranslate();
     }
 

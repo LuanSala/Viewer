@@ -6,6 +6,7 @@ package lsa.viewercloudpoints;
 
 import android.opengl.GLSurfaceView;
 import android.content.Context;
+import android.os.Bundle;
 import android.preference.Preference;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -32,6 +33,19 @@ public class MyGLSurfaceView extends GLSurfaceView
         setEGLContextClientVersion( 2 );
 
         mRenderer = new MyGLRenderer();
+        setRenderer(mRenderer);
+        setRenderMode(RENDERMODE_WHEN_DIRTY);
+        gestures = new DetectMultiTouch();
+    }
+
+    public MyGLSurfaceView(Context context, Bundle savedInstanceState){
+        super(context);
+        Global.setContext(context);
+
+        //Cria contexto de uso do OpenGL ES 2.0
+        setEGLContextClientVersion( 2 );
+
+        mRenderer = new MyGLRenderer(savedInstanceState);
         setRenderer(mRenderer);
         setRenderMode(RENDERMODE_WHEN_DIRTY);
         gestures = new DetectMultiTouch();

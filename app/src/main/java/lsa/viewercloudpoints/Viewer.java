@@ -33,9 +33,13 @@ public class Viewer extends Activity
         Global.setStateProgram(Global.STATE_RENDER_POINTS);
         Global.setViewingStyle(Global.VIEW_USING_TRACKBALL);
         setContentView(R.layout.layout_viewer);
-        mGLView = new MyGLSurfaceView(this);
+        if(savedInstanceState!=null)
+            mGLView = new MyGLSurfaceView(this,savedInstanceState);
+        else
+            mGLView = new MyGLSurfaceView(this);
+        global = new Global(mGLView,this);
         drawerLayout = (DrawerLayout)findViewById(R.id.drawerLayout);
-        drawerLayout.addView(mGLView,0);
+        drawerLayout.addView(mGLView,0);  //Não remover esta linha...
 
         ((PreferenceFragment)getFragmentManager().findFragmentByTag(getString(R.string.nav_drawer_TAG))).
                 findPreference(getString(R.string.key_mov_speed)).
@@ -44,8 +48,6 @@ public class Viewer extends Activity
                 ((MovementSpeedPreference)((PreferenceFragment)getFragmentManager().
                         findFragmentByTag(getString(R.string.nav_drawer_TAG))).
                         findPreference(getString(R.string.key_mov_speed))).getValue() );
-
-        global = new Global(mGLView,this);
 
         //Point p = new Point();
         //getWindowManager().getDefaultDisplay().getSize(p);
@@ -82,7 +84,7 @@ public class Viewer extends Activity
     public void exitApplication(View view) {
         Intent exit = new Intent(this,MainScreen.class);
         exit.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        exit.putExtra("EXIT",true);
+        exit.putExtra("EXIT", true);
         startActivity(exit);
         finish();
     }
@@ -110,6 +112,15 @@ public class Viewer extends Activity
     public void onClick(DialogInterface dialog, int which) {
         if(which==DialogInterface.BUTTON_POSITIVE)
             super.onBackPressed();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putFloatArray( getString(R.string.key_save_virtual_trackball),
+                ((MyGLRenderer)mGLView.getRenderer()).getVirtualTrackball().getForSaveInstanceState() );
+        outState.putFloatArray( getString(R.string.key_save_camera),
+                ((MyGLRenderer)mGLView.getRenderer()).getCamera().getForSaveInstanceState() );
     }
 
     @Override

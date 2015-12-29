@@ -1,10 +1,14 @@
 package lsa.viewercloudpoints;
 
 
+import android.opengl.Matrix;
+import android.util.Log;
+
 /**
  * Created by Luan Sala on 28/07/2015.
  */
 public class VirtualTrackball {
+    private static final String TAG = "VirtualTrackball";
 
     private static final byte UPDATE_NORMALIZE_ROTATION = 127;
 
@@ -14,6 +18,7 @@ public class VirtualTrackball {
 
     private boolean touchPressed = false;
 
+    private Quaternion test = new Quaternion(0f,0f,0f,0f);
     private float displacement[] = new float[3];
     private float mMatrix[]      = new float[16];
 
@@ -28,6 +33,15 @@ public class VirtualTrackball {
         loadMatrixIdentity();
     }
 
+    public VirtualTrackball(float[] floatArray){
+        this.rotation = new Quaternion(floatArray[0],floatArray[1],floatArray[2],floatArray[3]);
+        System.arraycopy(rotation.getMatrix(),0,mMatrix,0,16);
+        displacement[0] = floatArray[4];
+        displacement[1] = floatArray[5];
+        displacement[2] = floatArray[6];
+        applyTranslate();
+    }
+
     public void updateWindowSize(){
         width = Global.SCREEN_WIDTH;
         height = Global.SCREEN_HEIGHT;
@@ -37,7 +51,25 @@ public class VirtualTrackball {
         return new Quaternion(rotation);
     }
 
+    //Função que retorna os valores do estado atual da virtual trackball.
+    // floatArray[0,1,2,3] = quaternion
+    // floatArray[4,5,6] = displacement
+    public float[] getForSaveInstanceState(){
+        float[] rot = rotation.getFloatArray();
+        return new float[]{
+                rot[0], rot[1], rot[2], rot[3],
+                displacement[0],
+                displacement[1],
+                displacement[2]};
+    }
+
     public float[] getMatrix(){
+        //float[] tempMatrix = new float[16];
+        //test.set(0,displacement[0],0f,0f);
+        //test.set( (rotation.mult(test)).mult( rotation.conjugate() ) );
+        //Matrix.translateM(tempMatrix, 0, mMatrix, 0,
+                //test.getX(), test.getY(), test.getZ());
+        //return tempMatrix;
         return mMatrix;
     }
 
@@ -80,6 +112,7 @@ public class VirtualTrackball {
         pNew.normalize();
 
         VectorFloat axis = pNew.crossProduct(pOld);
+        //Log.d(TAG, ""+rotation);
         float arg = pOld.dotProduct(pNew);
         arg = arg>=-1f && arg<=1f ? arg : (arg/Math.abs(arg) > 0f ? 1f : -1f);
         float theta = (float)Math.acos( arg );
