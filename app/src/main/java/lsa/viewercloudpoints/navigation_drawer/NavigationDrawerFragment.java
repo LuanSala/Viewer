@@ -79,7 +79,7 @@ public class NavigationDrawerFragment extends PreferenceFragment
     public void onResume() {
         super.onResume();
         synchronized (this) {
-            if (modeVision.getValue() == getString(R.string.value_mode_virtual_trackball)) {
+            if (modeVision.getValue().equals(getString(R.string.value_mode_virtual_trackball))) {
                 centerCloud.setEnabled(true);
                 Global.setViewingStyle(Global.VIEW_USING_TRACKBALL);
             } else {
