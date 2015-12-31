@@ -8,7 +8,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Created by Luan Sala on 05/03/2015.
  */
-public class FileChooser extends ActionBarActivity
+public class FileChooser extends AppCompatActivity
         implements DialogInterface.OnClickListener, DialogInterface.OnDismissListener{
     private static final String TAG = "FileChooser";
 
@@ -124,7 +124,7 @@ public class FileChooser extends ActionBarActivity
             if( isActivityForResult ) {
                 Intent intent = new Intent();
                 intent.putExtra("fileSelected", fileSelected);
-                setResult(ActionBarActivity.RESULT_OK, intent);
+                setResult(AppCompatActivity.RESULT_OK,intent);
                 finish();
             } else {
                 Global.file = fileSelected;
@@ -146,7 +146,7 @@ public class FileChooser extends ActionBarActivity
             currentDirectory = currentDirectory.getParentFile();
             fillListView(currentDirectory);
         } else {
-            setResult(ActionBarActivity.RESULT_CANCELED);
+            setResult(AppCompatActivity.RESULT_CANCELED);
             finish();
         }
     }
