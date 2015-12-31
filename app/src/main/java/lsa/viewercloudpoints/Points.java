@@ -48,6 +48,7 @@ public class Points {
 
     private MediumPoint mMediumPointThread;
     private VectorFloat mediumPoint = new VectorFloat(3);
+    private float zoomNeeded;
 
     private int VBO[] = new int[1];
     //private FloatBuffer vertexBuffer;
@@ -97,6 +98,10 @@ public class Points {
 
     public VectorFloat getMediumPoint() {
         return mediumPoint;
+    }
+
+    public float getZoomNeeded(){
+        return zoomNeeded;
     }
 
     public boolean isEnabled(){
@@ -362,23 +367,55 @@ public class Points {
         public void run(){
             VectorFloat maxPoint = new VectorFloat(3);
             VectorFloat minPoint = new VectorFloat(3);
-            float x, y, z;
             maxPoint.setX(buffer.getFloat(0));
             maxPoint.setY(buffer.getFloat(4));
             maxPoint.setZ(buffer.getFloat(8));
             minPoint.setX(maxPoint.getX());
             minPoint.setY(maxPoint.getY());
             minPoint.setZ(maxPoint.getZ());
+
+            if(mPointCloudWithColor)
+                cloudWithColor(maxPoint,minPoint);
+            else
+                cloudWithoutColor(maxPoint,minPoint);
+
+            mediumPoint.setX( (maxPoint.getX() + minPoint.getX())*0.5f );
+            mediumPoint.setY( (maxPoint.getY() + minPoint.getY())*0.5f );
+            mediumPoint.setZ( (maxPoint.getZ() + minPoint.getZ())*0.5f );
+
+            byte option = 0x00;
+            float maxP_X = Math.abs(maxPoint.getX()), minP_X = Math.abs(minPoint.getX());
+            float maxP_Y = Math.abs(maxPoint.getY()), minP_Y = Math.abs(minPoint.getY());
+            if (maxP_X>minP_X && maxP_X>maxP_Y && maxP_X>minP_Y)
+                option = 0x01;
+            else if (minP_X>maxP_X && minP_X>maxP_Y && minP_X>minP_Y)
+                option = 0x02;
+            else if (maxP_Y>maxP_X && maxP_Y>minP_Y && maxP_Y>minP_Y)
+                option = 0x04;
+            else option = 0x08;
+
+            if ( (option&0x01)!=0 )
+                zoomNeeded = -(maxP_X+mediumPoint.norm());
+            else if ( (option&0x02)!=0 )
+                zoomNeeded = -(minP_X+mediumPoint.norm());
+            else if ( (option&0x04)!=0 )
+                zoomNeeded = -(maxP_Y+mediumPoint.norm());
+            else
+                zoomNeeded = -(minP_Y+mediumPoint.norm());
+
+            synchronized (this) {
+                mediumPointCalculated = true;
+                notify();
+            }
+        }
+
+        private void cloudWithColor(VectorFloat maxPoint, VectorFloat minPoint){
+            float x,y,z;
             for(int i=1; i<totalPoints; i++){
-                if(mPointCloudWithColor) {
-                    x = buffer.getFloat(i * 15);
-                    y = buffer.getFloat((i * 15) + 4);
-                    z = buffer.getFloat((i * 15) + 8);
-                }else{
-                    x = buffer.getFloat(i * 12);
-                    y = buffer.getFloat((i * 12) + 4);
-                    z = buffer.getFloat((i * 12) + 8);
-                }
+                x = buffer.getFloat(i * 15);
+                y = buffer.getFloat((i * 15) + 4);
+                z = buffer.getFloat((i * 15) + 8);
+
                 if( x>maxPoint.getX() ) maxPoint.setX(x);
                 if( y>maxPoint.getY() ) maxPoint.setY(y);
                 if( z>maxPoint.getZ() ) maxPoint.setZ(z);
@@ -386,17 +423,22 @@ public class Points {
                 if( y<minPoint.getY() ) minPoint.setY(y);
                 if( z<minPoint.getZ() ) minPoint.setZ(z);
             }
-            mediumPoint.setX( (maxPoint.getX() + minPoint.getX())*0.5f );
-            mediumPoint.setY( (maxPoint.getY() + minPoint.getY())*0.5f );
-            mediumPoint.setZ( (maxPoint.getZ() + minPoint.getZ())*0.5f );
-            synchronized (this) {
-                mediumPointCalculated = true;
-                notify();
+        }
+
+        private void cloudWithoutColor(VectorFloat maxPoint, VectorFloat minPoint){
+            float x,y,z;
+            for(int i=1; i<totalPoints; i++){
+                x = buffer.getFloat(i * 12);
+                y = buffer.getFloat((i * 12) + 4);
+                z = buffer.getFloat((i * 12) + 8);
+
+                if( x>maxPoint.getX() ) maxPoint.setX(x);
+                if( y>maxPoint.getY() ) maxPoint.setY(y);
+                if( z>maxPoint.getZ() ) maxPoint.setZ(z);
+                if( x<minPoint.getX() ) minPoint.setX(x);
+                if( y<minPoint.getY() ) minPoint.setY(y);
+                if( z<minPoint.getZ() ) minPoint.setZ(z);
             }
-            //Log.d(TAG,"Thread Finish!!");
-            //System.out.println("X = "+maxPoint.getX()+";  Y = "+maxPoint.getY()+";  Z = "+maxPoint.getZ());
-            //System.out.println("X = "+minPoint.getX()+";  Y = "+minPoint.getY()+";  Z = "+minPoint.getZ());
-            //System.out.println("X = "+mediumPoint.getX()+";  Y = "+mediumPoint.getY()+";  Z = "+mediumPoint.getZ());
         }
 
     }

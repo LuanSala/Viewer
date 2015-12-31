@@ -11,7 +11,6 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.os.Bundle;
-import android.util.Log;
 
 public class MyGLRenderer implements GLSurfaceView.Renderer {
     private static final String TAG = "MyGLRenderer";
@@ -38,6 +37,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     private int renderBuffer[] = new int[NUM_RENDERBUFFER];
 
     //public TexOpenFile fileButton;
+
+    public float deslocamentoTesteX = 0f;
 
     public MyGLRenderer() {
         mTranslucentBackground = true;
@@ -88,7 +89,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
                 if(mPoints.isEnabled()) {
                     if (MVPModified) {
                         if (Global.getViewingStyle() == Global.VIEW_USING_TRACKBALL) {
-                            if (Global.isTrackballCentered()) {
+                            if (Global.requestedCentralizeTrackball()) {
                                 synchronized (mPoints.getMediumPointThread()) {
                                     if (!mPoints.mediumPointCalculated())
                                         try {
@@ -97,10 +98,12 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
                                             e.printStackTrace();
                                         }
                                 }
-                                Matrix.translateM(tempMatrix, 0, virtualTrackball.getMatrix(), 0,
-                                        -mPoints.getMediumPoint().getX(),
-                                        -mPoints.getMediumPoint().getY(),
-                                        -mPoints.getMediumPoint().getZ());
+                                //Matrix.translateM(tempMatrix, 0, virtualTrackball.getMatrix(), 0,
+                                        //-mPoints.getMediumPoint().getX(),
+                                        //-mPoints.getMediumPoint().getY(),
+                                        //-mPoints.getMediumPoint().getZ());
+                                virtualTrackball.setDisplacement(mPoints.getMediumPoint(),mPoints.getZoomNeeded());
+                                System.arraycopy(virtualTrackball.getMatrix(), 0, tempMatrix, 0, 16);
                             } else
                                 System.arraycopy(virtualTrackball.getMatrix(), 0, tempMatrix, 0, 16);
                             Matrix.multiplyMM(mMVPMatrix, 0,
@@ -164,6 +167,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
     public void updatePoints(){
         updatePoints = true;
+        Global.centralizeTrackball();
     }
 
     public void updateFrameBuffer(int width, int height){

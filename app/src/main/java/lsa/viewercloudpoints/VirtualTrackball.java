@@ -39,7 +39,7 @@ public class VirtualTrackball {
         displacement[0] = floatArray[4];
         displacement[1] = floatArray[5];
         displacement[2] = floatArray[6];
-        applyTranslate();
+        applyZoom();
     }
 
     public void updateWindowSize(){
@@ -64,13 +64,23 @@ public class VirtualTrackball {
     }
 
     public float[] getMatrix(){
-        //float[] tempMatrix = new float[16];
+        float[] tempMatrix = new float[16];
         //test.set(0,displacement[0],0f,0f);
         //test.set( (rotation.mult(test)).mult( rotation.conjugate() ) );
-        //Matrix.translateM(tempMatrix, 0, mMatrix, 0,
-                //test.getX(), test.getY(), test.getZ());
-        //return tempMatrix;
-        return mMatrix;
+        Matrix.translateM(tempMatrix, 0, mMatrix, 0,
+                displacement[0], displacement[1], displacement[2]);
+        return tempMatrix;
+        //return mMatrix;
+    }
+
+    public void setDisplacement(VectorFloat displac, float zoom){
+        if ( displac!=null ) {
+            displacement[0] = -displac.getX();
+            displacement[1] = -displac.getY();
+            displacement[2] = -displac.getZ();
+            this.zoom = zoom;
+            applyZoom();
+        }
     }
 
     public void pointerDown(float x, float y){
@@ -91,7 +101,7 @@ public class VirtualTrackball {
             trackball(x, y);
 
             oldPointer.set(x, y);
-            applyTranslate();
+            applyZoom();
         }else pointerDown(x,y);
     }
 
@@ -139,23 +149,23 @@ public class VirtualTrackball {
 
     public void moveX(float dx){
         displacement[0] -= dx;
-        applyTranslate();
+        //applyZoom();
     }
 
     public void moveY(float dy){
         displacement[1] -= dy;
-        applyTranslate();
+        //applyZoom();
     }
 
     public void moveZ(float dz){
-        displacement[2] -= dz;
-        applyTranslate();
+        zoom -= dz;
+        applyZoom();
     }
 
-    private void applyTranslate(){
-        mMatrix[12] = displacement[0];
-        mMatrix[13] = displacement[1];
-        mMatrix[14] = displacement[2];
+    private void applyZoom(){
+        //mMatrix[12] = displacement[0];
+        //mMatrix[13] = displacement[1];
+        mMatrix[14] = zoom;
         mMatrix[15] = 1f;
     }
 
@@ -166,4 +176,5 @@ public class VirtualTrackball {
         mMatrix[12]=0f; mMatrix[13]=0f; mMatrix[14]=0f; mMatrix[15]=1f;
     }
 
+    private float zoom;
 }

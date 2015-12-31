@@ -13,6 +13,7 @@ import java.lang.reflect.InvocationTargetException;
  * Created by Luan Sala on 25/02/2015.
  */
 public class Global {
+    private static final String TAG = "Global";
 
     /**
      * Codigo de requisicao usado para identificar o resultado da atividade FileChooser
@@ -119,12 +120,16 @@ public class Global {
         return (ratio * width);
     }
 
-    public static boolean isTrackballCentered(){
-        return centerTrackball;
+    public static boolean requestedCentralizeTrackball(){
+        boolean ret = true;
+        if (centerTrackball)
+            centerTrackball = false;
+        else ret = false;
+        return ret;
     }
 
-    public static void useTrackballCentered(boolean use){
-        centerTrackball = use;
+    public static void centralizeTrackball(){
+        centerTrackball = true;
     }
 
     public static boolean clickedInButton(Texture button,float clickX,float clickY){
