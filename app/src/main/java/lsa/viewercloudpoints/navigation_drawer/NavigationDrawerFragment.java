@@ -4,12 +4,8 @@ import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.preference.SwitchPreference;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
-import android.view.WindowManager;
 
 import lsa.viewercloudpoints.Global;
 import lsa.viewercloudpoints.R;
@@ -18,10 +14,10 @@ import lsa.viewercloudpoints.R;
  * Created by Luan Sala on 09/08/2015.
  */
 public class NavigationDrawerFragment extends PreferenceFragment
-        implements Preference.OnPreferenceChangeListener {
+        implements Preference.OnPreferenceChangeListener, Preference.OnPreferenceClickListener {
     private static final String TAG = "NavigationDrawerFragment";
 
-    private SwitchPreference centerCloud;
+    private Preference centerCloud;
     private ListPreference modeVision;
 
     @Override
@@ -34,8 +30,8 @@ public class NavigationDrawerFragment extends PreferenceFragment
         modeVision.setOnPreferenceChangeListener(this);
         findPreference(getString(R.string.key_full_screen)).setOnPreferenceChangeListener(this);
 
-        centerCloud = (SwitchPreference)findPreference(getString(R.string.key_center_trackball));
-        centerCloud.setOnPreferenceChangeListener(this);
+        centerCloud = findPreference(getString(R.string.key_center_trackball));
+        centerCloud.setOnPreferenceClickListener(this);
     }
 
     @Override
@@ -49,13 +45,6 @@ public class NavigationDrawerFragment extends PreferenceFragment
                     centerCloud.setEnabled(false);
                     Global.setViewingStyle(Global.VIEW_USING_CAMERA);
                 }
-                notifyAll();
-            }
-            ((DrawerLayout) getActivity().findViewById(R.id.drawerLayout)).closeDrawer(
-                    getActivity().findViewById(R.id.linear_layout_drawerLayout));
-        } else if( preference.getKey().equals(getString(R.string.key_center_trackball)) ) {
-            synchronized (this){
-                Global.useTrackballCentered((boolean)newValue);
                 notifyAll();
             }
             ((DrawerLayout) getActivity().findViewById(R.id.drawerLayout)).closeDrawer(
@@ -76,6 +65,19 @@ public class NavigationDrawerFragment extends PreferenceFragment
     }
 
     @Override
+    public boolean onPreferenceClick(Preference preference) {
+        if (preference.getKey().equals(getString(R.string.key_center_trackball))) {
+            synchronized (this) {
+                Global.centralizeTrackball();
+                notifyAll();
+            }
+            ((DrawerLayout) getActivity().findViewById(R.id.drawerLayout)).closeDrawer(
+                    getActivity().findViewById(R.id.linear_layout_drawerLayout));
+        }
+        return true;
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         synchronized (this) {
@@ -86,7 +88,7 @@ public class NavigationDrawerFragment extends PreferenceFragment
                 centerCloud.setEnabled(false);
                 Global.setViewingStyle(Global.VIEW_USING_CAMERA);
             }
-            Global.useTrackballCentered( centerCloud.isChecked() );
+            //Global.useTrackballCentered( centerCloud.isChecked() );
             notifyAll();
         }
     }
