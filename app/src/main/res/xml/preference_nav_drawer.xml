@@ -24,17 +24,14 @@
             android:defaultValue="50"
             movspeedpref:maxValue="100"/>
 
-        <SwitchPreference
+        <Preference
             android:key="@string/key_center_trackball"
-            android:title="Centralizar Trackball"
-            android:defaultValue="false"
-            android:persistent="false"
-            android:textColor="@color/primary_text_default_material_light"/>
+            android:title="Centralizar Trackball" />
+
 
     </PreferenceCategory>
 
     <PreferenceCategory>
-
         <SwitchPreference
             android:key="@string/key_full_screen"
             android:title="Full Screen"
