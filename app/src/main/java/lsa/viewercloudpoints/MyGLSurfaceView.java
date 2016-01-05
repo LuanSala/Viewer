@@ -8,7 +8,6 @@ import android.opengl.GLSurfaceView;
 import android.content.Context;
 import android.os.Bundle;
 import android.preference.Preference;
-import android.util.Log;
 import android.view.MotionEvent;
 
 import java.util.ArrayList;
@@ -230,7 +229,7 @@ public class MyGLSurfaceView extends GLSurfaceView
                             if( !detectMovements() ) {
                                 //Gesto de pinça. Zoom in ou Zoom out
                                 if (Global.getViewingStyle() == Global.VIEW_USING_TRACKBALL)
-                                    mRenderer.getVirtualTrackball().moveZ((oldDistancePointers - actualDistancePointers) * speedMultiTouch);
+                                    mRenderer.getVirtualTrackball().zoom((oldDistancePointers - actualDistancePointers) * speedMultiTouch);
                                 else
                                     mRenderer.getCamera().moveZ((oldDistancePointers - actualDistancePointers) * speedMultiTouch);
                             }

@@ -38,8 +38,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
     //public TexOpenFile fileButton;
 
-    public float deslocamentoTesteX = 0f;
-
     public MyGLRenderer() {
         mTranslucentBackground = true;
         MVPModified = true;
@@ -102,7 +100,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
                                         //-mPoints.getMediumPoint().getX(),
                                         //-mPoints.getMediumPoint().getY(),
                                         //-mPoints.getMediumPoint().getZ());
-                                virtualTrackball.setDisplacement(mPoints.getMediumPoint(),mPoints.getZoomNeeded());
+                                virtualTrackball.setCenter(mPoints.getMediumPoint(), mPoints.getZoomNeeded());
                                 System.arraycopy(virtualTrackball.getMatrix(), 0, tempMatrix, 0, 16);
                             } else
                                 System.arraycopy(virtualTrackball.getMatrix(), 0, tempMatrix, 0, 16);

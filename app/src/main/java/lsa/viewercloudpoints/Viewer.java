@@ -32,12 +32,13 @@ public class Viewer extends Activity
         //Global.setStateProgram(Global.STATE_INIT_PROGRAM);
         Global.setStateProgram(Global.STATE_RENDER_POINTS);
         Global.setViewingStyle(Global.VIEW_USING_TRACKBALL);
-        Global.centralizeTrackball();
         setContentView(R.layout.layout_viewer);
         if(savedInstanceState!=null)
             mGLView = new MyGLSurfaceView(this,savedInstanceState);
-        else
+        else {
+            Global.centralizeTrackball();
             mGLView = new MyGLSurfaceView(this);
+        }
         global = new Global(mGLView,this);
         drawerLayout = (DrawerLayout)findViewById(R.id.drawerLayout);
         drawerLayout.addView(mGLView,0);  //Não remover esta linha...

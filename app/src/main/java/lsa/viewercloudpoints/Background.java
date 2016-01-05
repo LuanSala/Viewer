@@ -125,13 +125,13 @@ public class Background {
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,BO[VERTEX_BUFFER]);
         GLES20.glEnableVertexAttribArray(mPosition);
         GLES20.glEnableVertexAttribArray(mColor);
-        GLES20.glVertexAttribPointer(mPosition,3,GLES20.GL_FLOAT,false,24,0);
+        GLES20.glVertexAttribPointer(mPosition, 3, GLES20.GL_FLOAT, false, 24, 0);
         GLES20.glVertexAttribPointer(mColor,3, GLES20.GL_FLOAT, false,24,12);
-        GLES20.glDrawElements(GLES20.GL_TRIANGLES,6,GLES20.GL_UNSIGNED_BYTE,0);
-        GLES20.glFlush();
-        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,0);
+        GLES20.glDrawElements(GLES20.GL_TRIANGLES, 6, GLES20.GL_UNSIGNED_BYTE, 0);
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
         GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
         GLES20.glUseProgram(0);
+        GLES20.glFlush();
     }
 
     /*

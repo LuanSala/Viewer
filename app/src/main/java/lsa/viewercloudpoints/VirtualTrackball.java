@@ -2,7 +2,6 @@ package lsa.viewercloudpoints;
 
 
 import android.opengl.Matrix;
-import android.util.Log;
 
 /**
  * Created by Luan Sala on 28/07/2015.
@@ -18,7 +17,7 @@ public class VirtualTrackball {
 
     private boolean touchPressed = false;
 
-    private Quaternion test = new Quaternion(0f,0f,0f,0f);
+    private float center[]       = new float[3];
     private float displacement[] = new float[3];
     private float mMatrix[]      = new float[16];
 
@@ -39,6 +38,10 @@ public class VirtualTrackball {
         displacement[0] = floatArray[4];
         displacement[1] = floatArray[5];
         displacement[2] = floatArray[6];
+        center[0] = floatArray[7];
+        center[1] = floatArray[8];
+        center[2] = floatArray[9];
+        zoom      = floatArray[10];
         applyZoom();
     }
 
@@ -54,30 +57,35 @@ public class VirtualTrackball {
     //Função que retorna os valores do estado atual da virtual trackball.
     // floatArray[0,1,2,3] = quaternion
     // floatArray[4,5,6] = displacement
+    // floatArray[7,8,9] = center
+    // floatArray[10]    = zoom
     public float[] getForSaveInstanceState(){
         float[] rot = rotation.getFloatArray();
         return new float[]{
                 rot[0], rot[1], rot[2], rot[3],
                 displacement[0],
                 displacement[1],
-                displacement[2]};
+                displacement[2],
+                center[0],
+                center[1],
+                center[2],
+                zoom};
     }
 
     public float[] getMatrix(){
         float[] tempMatrix = new float[16];
-        //test.set(0,displacement[0],0f,0f);
-        //test.set( (rotation.mult(test)).mult( rotation.conjugate() ) );
+
         Matrix.translateM(tempMatrix, 0, mMatrix, 0,
-                displacement[0], displacement[1], displacement[2]);
+                center[0]+ displacement[0], center[1]+ displacement[1], center[2]+ displacement[2]);
         return tempMatrix;
-        //return mMatrix;
     }
 
-    public void setDisplacement(VectorFloat displac, float zoom){
-        if ( displac!=null ) {
-            displacement[0] = -displac.getX();
-            displacement[1] = -displac.getY();
-            displacement[2] = -displac.getZ();
+    public void setCenter(VectorFloat center, float zoom){
+        if ( center!=null ) {
+            this.center[0] = -center.getX();
+            this.center[1] = -center.getY();
+            this.center[2] = -center.getZ();
+            displacement[0] = displacement[1] = displacement[2] = 0f;
             this.zoom = zoom;
             applyZoom();
         }
@@ -131,7 +139,6 @@ public class VirtualTrackball {
             countUpdateRotation = 0;
             rotation.normalize();
         }else countUpdateRotation++;
-        //mMatrix = rotation.getMatrix();
         System.arraycopy(rotation.getMatrix(),0,mMatrix,0,16);
     }
 
@@ -148,23 +155,27 @@ public class VirtualTrackball {
     }
 
     public void moveX(float dx){
-        displacement[0] -= dx;
-        //applyZoom();
+        Quaternion quat = new Quaternion(0,-dx,0,0);
+        float[] disp = (rotation.mult(quat).mult(rotation.conjugate())).getFloatArray();
+        displacement[0] += disp[1];
+        displacement[1] += disp[2];
+        displacement[2] += disp[3];
     }
 
     public void moveY(float dy){
-        displacement[1] -= dy;
-        //applyZoom();
+        Quaternion quat = new Quaternion(0,0,-dy,0);
+        float[] disp = (rotation.mult(quat).mult(rotation.conjugate())).getFloatArray();
+        displacement[0] += disp[1];
+        displacement[1] += disp[2];
+        displacement[2] += disp[3];
     }
 
-    public void moveZ(float dz){
+    public void zoom(float dz){
         zoom -= dz;
         applyZoom();
     }
 
     private void applyZoom(){
-        //mMatrix[12] = displacement[0];
-        //mMatrix[13] = displacement[1];
         mMatrix[14] = zoom;
         mMatrix[15] = 1f;
     }
