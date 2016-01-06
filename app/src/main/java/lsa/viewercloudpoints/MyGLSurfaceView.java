@@ -8,7 +8,9 @@ import android.opengl.GLSurfaceView;
 import android.content.Context;
 import android.os.Bundle;
 import android.preference.Preference;
+import android.util.Log;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 
 import java.util.ArrayList;
 
@@ -35,6 +37,7 @@ public class MyGLSurfaceView extends GLSurfaceView
         setRenderer(mRenderer);
         setRenderMode(RENDERMODE_WHEN_DIRTY);
         gestures = new DetectMultiTouch();
+        scaleGestureDetector = new ScaleGestureDetector(context, new ScaleListener());
     }
 
     public MyGLSurfaceView(Context context, Bundle savedInstanceState){
@@ -48,6 +51,7 @@ public class MyGLSurfaceView extends GLSurfaceView
         setRenderer(mRenderer);
         setRenderMode(RENDERMODE_WHEN_DIRTY);
         gestures = new DetectMultiTouch();
+        scaleGestureDetector = new ScaleGestureDetector(context, new ScaleListener());
     }
 
     public Renderer getRenderer(){
@@ -80,6 +84,7 @@ public class MyGLSurfaceView extends GLSurfaceView
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        scaleGestureDetector.onTouchEvent(event);
         if(event.getPointerCount()==1) {
             final float actualX = event.getX();
             final float actualY = event.getY();
@@ -133,6 +138,20 @@ public class MyGLSurfaceView extends GLSurfaceView
             speedMultiTouch = calculateSpeedMultiTouch((int)newValue);
         }
         return true;
+    }
+
+    private class ScaleListener extends
+            ScaleGestureDetector.SimpleOnScaleGestureListener {
+        private static final String TAG = "ScaleListener";
+
+        @Override
+        public boolean onScale(ScaleGestureDetector detector) {
+            if (Global.getViewingStyle()==Global.VIEW_USING_TRACKBALL)
+                mRenderer.getVirtualTrackball().zoom( (1f-detector.getScaleFactor())*1000 * speedMultiTouch );
+            else
+                mRenderer.getCamera().moveZ( (1f-detector.getScaleFactor())*1000 * speedMultiTouch );
+            return true;
+        }
     }
 
     /**
@@ -226,14 +245,9 @@ public class MyGLSurfaceView extends GLSurfaceView
                                     actualSecondX - previousPointerPos[POS_POINTER_2].getX(),
                                     actualSecondY - previousPointerPos[POS_POINTER_2].getY() );
 
-                            if( !detectMovements() ) {
-                                //Gesto de pinça. Zoom in ou Zoom out
-                                if (Global.getViewingStyle() == Global.VIEW_USING_TRACKBALL)
-                                    mRenderer.getVirtualTrackball().zoom((oldDistancePointers - actualDistancePointers) * speedMultiTouch);
-                                else
-                                    mRenderer.getCamera().moveZ((oldDistancePointers - actualDistancePointers) * speedMultiTouch);
-                            }
+                            detectMovements();
 
+                            //Log.d(TAG,""+(oldDistancePointers - actualDistancePointers) * speedMultiTouch);
                             oldDistancePointers = actualDistancePointers;
                             previousPointerPos[POS_POINTER_2].set(actualSecondX, actualSecondY);
                             mPreviousPointerPos.set(actualFirstX, actualFirstY);
@@ -312,9 +326,9 @@ public class MyGLSurfaceView extends GLSurfaceView
                 if (angle2 >= 155.0f && angle2 <= 180.0f)
                     if (angle1 >= 155.0f && angle1 <= 180.0f) {
                         if( Global.getViewingStyle()==Global.VIEW_USING_TRACKBALL )
-                            mRenderer.getVirtualTrackball().moveX((-vectorDisplacPointer[DISPLAC_POINTER_2].getX())*speedMultiTouch);
+                            mRenderer.getVirtualTrackball().moveX((-vectorDisplacPointer[DISPLAC_POINTER_2].getX()) * speedMultiTouch);
                         else
-                            mRenderer.getCamera().moveX((vectorDisplacPointer[DISPLAC_POINTER_2].getX())*speedMultiTouch);
+                            mRenderer.getCamera().moveX((vectorDisplacPointer[DISPLAC_POINTER_2].getX()) * speedMultiTouch);
                         ret = true;
                     }
             }else if(direction == MOVE_RIGHT) {
@@ -383,6 +397,6 @@ public class MyGLSurfaceView extends GLSurfaceView
 
     }// end class DetectMultiTouch
 
-
+    private ScaleGestureDetector scaleGestureDetector;
 
 } // end class MyGLSurfaceView
