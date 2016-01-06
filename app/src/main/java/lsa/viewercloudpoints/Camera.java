@@ -76,21 +76,10 @@ public class Camera {
         rotation.set( rotation.mult(q) );
     }
 
-    public void moveX(float dx){
+    public void move(float dx, float dy){
         System.arraycopy(rotation.getMatrix(),0,tempViewMatrix,0,16);
         //tempViewMatrix = rotation.getMatrix();
-        Quaternion displac = new Quaternion(0,-dx,0,0);
-        displac.set( rotation.mult(displac).mult(rotation.conjugate()) );
-        displacement[0] += displac.getX();
-        displacement[1] += displac.getY();
-        displacement[2] += displac.getZ();
-        applyTranslate();
-    }
-
-    public void moveY(float dy){
-        System.arraycopy(rotation.getMatrix(),0,tempViewMatrix,0,16);
-        ///tempViewMatrix = rotation.getMatrix();
-        Quaternion displac = new Quaternion(0,0,-dy,0);
+        Quaternion displac = new Quaternion(0,-dx,dy,0);
         displac.set( rotation.mult(displac).mult(rotation.conjugate()) );
         displacement[0] += displac.getX();
         displacement[1] += displac.getY();

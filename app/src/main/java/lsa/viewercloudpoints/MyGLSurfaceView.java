@@ -168,11 +168,8 @@ public class MyGLSurfaceView extends GLSurfaceView
         private static final byte DIST_1_TO_2 = 0;
         private static final byte DIST_2_TO_1 = 1;
 
-        private static final byte MOVE_LEFT = 0;
-        private static final byte MOVE_RIGHT = 1;
-        private static final byte MOVE_UP = 2;
-        private static final byte MOVE_DOWN = 4;
-        private static final byte ROTATE_Z = 8;
+        private static final byte ROTATE_Z = 1;
+        private static final byte MOVE = 2;
 
         private VectorFloat[] previousPointerPos = new VectorFloat[MAX_POINTERS-1];
         private VectorFloat[] vectorDisplacPointer = new VectorFloat[MAX_POINTERS];
@@ -299,11 +296,8 @@ public class MyGLSurfaceView extends GLSurfaceView
             modulus[DISPLAC_POINTER_1] = vectorDisplacPointer[DISPLAC_POINTER_1].norm();
             modulus[DISPLAC_POINTER_2] = vectorDisplacPointer[DISPLAC_POINTER_2].norm();
 
-            if( movements(MOVE_LEFT) ) ret=true;
-            else if( movements(MOVE_RIGHT) ) ret=true;
-            else if( movements(MOVE_UP) )    ret=true;
-            else if( movements(MOVE_DOWN) )  ret=true;
-            else if( movements(ROTATE_Z) )   ret=true;
+            if ( movements(ROTATE_Z) ) ret = true;
+            else if( movements(MOVE) ) ret=true;
 
             return ret;
         }
@@ -311,54 +305,27 @@ public class MyGLSurfaceView extends GLSurfaceView
         private boolean movements(byte direction){
             boolean ret = false;
             float angle1, angle2;
-            if( direction==MOVE_UP || direction==MOVE_DOWN ){
-                angle1 = (float)(Math.acos( (-vectorDisplacPointer[DISPLAC_POINTER_1].getY()/
-                        modulus[DISPLAC_POINTER_1]) )*180.0/Math.PI);
-                angle2 = (float)(Math.acos( (-vectorDisplacPointer[DISPLAC_POINTER_2].getY()/
-                        modulus[DISPLAC_POINTER_2]) )*180.0/Math.PI);
-            } else {
-                angle1 = (float)(Math.acos( (vectorDisplacPointer[DISPLAC_POINTER_1].getX()/
-                        modulus[DISPLAC_POINTER_1]) )*180.0/Math.PI);
-                angle2 = (float)(Math.acos( (vectorDisplacPointer[DISPLAC_POINTER_2].getX()/
-                        modulus[DISPLAC_POINTER_2]) )*180.0/Math.PI);
-            }
-            if(direction == MOVE_LEFT) {
-                if (angle2 >= 155.0f && angle2 <= 180.0f)
-                    if (angle1 >= 155.0f && angle1 <= 180.0f) {
-                        if( Global.getViewingStyle()==Global.VIEW_USING_TRACKBALL )
-                            mRenderer.getVirtualTrackball().moveX((-vectorDisplacPointer[DISPLAC_POINTER_2].getX()) * speedMultiTouch);
-                        else
-                            mRenderer.getCamera().moveX((vectorDisplacPointer[DISPLAC_POINTER_2].getX()) * speedMultiTouch);
-                        ret = true;
-                    }
-            }else if(direction == MOVE_RIGHT) {
-                if( angle2>=0.0f && angle2<=25.0f )
-                    if( angle1>=0.0f && angle1<=25.0f ) {
-                        if( Global.getViewingStyle()==Global.VIEW_USING_TRACKBALL )
-                            mRenderer.getVirtualTrackball().moveX((-vectorDisplacPointer[DISPLAC_POINTER_2].getX())*speedMultiTouch);
-                        else
-                            mRenderer.getCamera().moveX((vectorDisplacPointer[DISPLAC_POINTER_2].getX())*speedMultiTouch);
-                        ret = true;
-                    }
-            }else if(direction == MOVE_UP){
-                if( angle2>=0.0f && angle2<=25.0f )
-                    if( angle1>=0.0f && angle1<=25.0f ){
-                        if( Global.getViewingStyle()==Global.VIEW_USING_TRACKBALL )
-                            mRenderer.getVirtualTrackball().moveY((vectorDisplacPointer[DISPLAC_POINTER_2].getY())*speedMultiTouch);
-                        else
-                            mRenderer.getCamera().moveY((-vectorDisplacPointer[DISPLAC_POINTER_2].getY())*speedMultiTouch);
-                        ret = true;
-                    }
-            }else if(direction == MOVE_DOWN){
-                if( angle2>=155.0f && angle2<=180.0f )
-                    if( angle1>=155.0f && angle1<=180.0f ){
-                        if( Global.getViewingStyle()==Global.VIEW_USING_TRACKBALL )
-                            mRenderer.getVirtualTrackball().moveY((vectorDisplacPointer[DISPLAC_POINTER_2].getY())*speedMultiTouch);
-                        else
-                            mRenderer.getCamera().moveY((-vectorDisplacPointer[DISPLAC_POINTER_2].getY())*speedMultiTouch);
-                        ret = true;
-                    }
-            }else if(direction == ROTATE_Z){
+
+            angle1 = (float)(Math.acos( (vectorDisplacPointer[DISPLAC_POINTER_1].getX()/
+                    modulus[DISPLAC_POINTER_1]) )*180.0/Math.PI);
+            angle2 = (float)(Math.acos( (vectorDisplacPointer[DISPLAC_POINTER_2].getX()/
+                    modulus[DISPLAC_POINTER_2]) )*180.0/Math.PI);
+
+            if( (direction&MOVE)!=0 ) {
+                boolean signalX, signalY; //true para sinais igual, false para sinais diferentes.
+                signalX = vectorDisplacPointer[DISPLAC_POINTER_1].getX()<=0f && vectorDisplacPointer[DISPLAC_POINTER_2].getX()<=0f ||
+                        vectorDisplacPointer[DISPLAC_POINTER_1].getX()>=0f && vectorDisplacPointer[DISPLAC_POINTER_2].getX()>=0f;
+                signalY = vectorDisplacPointer[DISPLAC_POINTER_1].getY()<=0f && vectorDisplacPointer[DISPLAC_POINTER_2].getY()<=0f ||
+                        vectorDisplacPointer[DISPLAC_POINTER_1].getY()>=0f && vectorDisplacPointer[DISPLAC_POINTER_2].getY()>=0f;
+                if (signalX && signalY)
+                    if ( Global.getViewingStyle()==Global.VIEW_USING_TRACKBALL )
+                        mRenderer.getVirtualTrackball().move((vectorDisplacPointer[DISPLAC_POINTER_2].getX())*speedMultiTouch,
+                                (vectorDisplacPointer[DISPLAC_POINTER_2].getY())*speedMultiTouch);
+                    else
+                        mRenderer.getCamera().move((vectorDisplacPointer[DISPLAC_POINTER_2].getX()) * speedMultiTouch,
+                                (vectorDisplacPointer[DISPLAC_POINTER_2].getY())*speedMultiTouch);
+                ret = true;
+            } else if( (direction&ROTATE_Z)!=0 ){
                 if( Global.getViewingStyle()==Global.VIEW_USING_CAMERA ) {
                     float distancePointersTested = distancePointers[DIST_1_TO_2].getY();
                     float value = vectorDisplacPointer[DISPLAC_POINTER_1].getX();
@@ -396,6 +363,7 @@ public class MyGLSurfaceView extends GLSurfaceView
 
 
     }// end class DetectMultiTouch
+
 
     private ScaleGestureDetector scaleGestureDetector;
 

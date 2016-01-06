@@ -154,16 +154,8 @@ public class VirtualTrackball {
             p.setZ( (r*r)/(2f*length) );
     }
 
-    public void moveX(float dx){
-        Quaternion quat = new Quaternion(0,-dx,0,0);
-        float[] disp = (rotation.mult(quat).mult(rotation.conjugate())).getFloatArray();
-        displacement[0] += disp[1];
-        displacement[1] += disp[2];
-        displacement[2] += disp[3];
-    }
-
-    public void moveY(float dy){
-        Quaternion quat = new Quaternion(0,0,-dy,0);
+    public void move(float dx, float dy) {
+        Quaternion quat = new Quaternion(0,dx,-dy,0);
         float[] disp = (rotation.mult(quat).mult(rotation.conjugate())).getFloatArray();
         displacement[0] += disp[1];
         displacement[1] += disp[2];

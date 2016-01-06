@@ -145,7 +145,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
             virtualTrackball = new VirtualTrackball();
         if (camera==null) {
             camera = new Camera();
-            camera.moveX(5f);
+            camera.move(5f,0);
             camera.moveZ(20f);
         }
         refreshMVP();
