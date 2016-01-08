@@ -17,13 +17,24 @@
 
     <!-- TAG usada para definir o navigationDrawer com o fragment do PreferenceFragment
     responsavel pelas configurações -->
-    <string name="nav_drawer_TAG">nav_drawer_TAG</string>
+    <string name="tag_nav_drawer_fragment">nav_drawer_TAG</string>
 
     <!-- Chaves utilizadas na definicao das preferencias que estão embutidas no NavigationDrawer -->
     <string name="key_mode_vision">key_mode_vision</string>
     <string name="key_mov_speed">key_mov_speed</string>
-    <string name="key_center_trackball">key_center_trackball</string>
+    <string name="key_centralize_trackball">key_centralize_trackball</string>
     <string name="key_full_screen">key_full_screen</string>
+    <string name="key_show_axis_trackball">key_show_axis_trackball</string>
+
+    <!-- Informações mostradas nas preferências na navigation drawer -->
+    <string name="title_configuration">Configurações</string>
+    <string name="title_mode_vision">Modo de visão</string>
+    <string name="dialogTitle_mode_vision">Modo de visão</string>
+    <string name="title_velocity">Velocidade</string>
+    <string name="dialogTitle_velocity">Velocidade de movimento</string>
+    <string name="title_centralize_trackball">Centralizar nuvem</string>
+    <string name="title_show_axis_trackball">Eixo 3D</string>
+    <string name="title_full_screen">Full screen</string>
 
     <!-- Valores usados na configuracao da preferencia de escolha do modo de visualizacao -->
     <string name="value_mode_virtual_trackball">value_virtual_trackball</string>

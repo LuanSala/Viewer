@@ -3,7 +3,6 @@ package lsa.viewercloudpoints;
 import android.app.Activity;
 import android.content.Context;
 import android.preference.PreferenceFragment;
-import android.util.Log;
 import android.util.SparseArray;
 
 import java.lang.reflect.InvocationTargetException;
@@ -169,7 +168,7 @@ public class Global {
             this.glSurfaceView = glSurfaceView;
             if(glSurfaceView!=null) mHasGLSurface = true;
             navigationDrawer = (PreferenceFragment)getActivity().getFragmentManager().
-                    findFragmentById(R.id.fragment);
+                    findFragmentById(R.id.id_nav_drawer_fragment);
         }
 
         @Override
@@ -185,7 +184,7 @@ public class Global {
                         synchronized (mLock) {
                             if (mDone) break;
                         }
-                        ((MyGLRenderer)glSurfaceView.getRenderer()).refreshMVP();
+                        glSurfaceView.getRenderer().refreshMVP();
                         glSurfaceView.requestRender();
                     }
                 }

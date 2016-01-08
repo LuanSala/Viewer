@@ -22,10 +22,10 @@ public class Background {
     // canto do quadrado do plano de fundo.
     private float[] buffer = {
             //----VERTEX----     -----COLOR-----
-            0.0f, 0.0f, 0.0f,    0.2f, 0.2f, 0.7f,
-            0.0f, 0.0f, 0.0f,    0.2f, 0.2f, 0.7f,
-            0.0f, 0.0f, 0.0f,    0.1f, 0.1f, 0.2f,
-            0.0f, 0.0f, 0.0f,    0.1f, 0.1f, 0.2f
+            0.0f, 0.0f, 0.0f,    0.2f, 0.2f, 0.7f,  //Canto inferior esquerdo
+            0.0f, 0.0f, 0.0f,    0.2f, 0.2f, 0.7f,  //Canto inferior direito
+            0.0f, 0.0f, 0.0f,    0.1f, 0.1f, 0.2f,  //Canto superior direito
+            0.0f, 0.0f, 0.0f,    0.1f, 0.1f, 0.2f   //Canto superior esquerdo
     };
     //Indices que são utilizados para fazer a renderização do retângulo do background.
     private byte[] indexs = {
@@ -85,8 +85,8 @@ public class Background {
         GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
-    public void update(float[] projectionMatrix){
-        //Log.d(TAG,"update");
+    public void updateProjectionMatrix(float[] projectionMatrix){
+        //Log.d(TAG,"updateProjectionMatrix");
         System.arraycopy(projectionMatrix,0,matrix,0,projectionMatrix.length);
         System.arraycopy(projectionMatrix,0,this.projectionMatrix,0,projectionMatrix.length);
 
