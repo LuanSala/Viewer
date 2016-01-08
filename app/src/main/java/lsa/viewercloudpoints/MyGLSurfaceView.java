@@ -4,10 +4,14 @@ package lsa.viewercloudpoints;
  * Created by Luan Sala on 09/02/2015.
  */
 
+import android.app.Activity;
+import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.content.Context;
 import android.os.Bundle;
 import android.preference.Preference;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -15,7 +19,7 @@ import android.view.ScaleGestureDetector;
 import java.util.ArrayList;
 
 public class MyGLSurfaceView extends GLSurfaceView
-    implements Preference.OnPreferenceChangeListener{
+    implements Preference.OnPreferenceChangeListener {
     private static final String TAG = "MyGLSurfaceView";
 
     private final MyGLRenderer mRenderer;
@@ -54,7 +58,7 @@ public class MyGLSurfaceView extends GLSurfaceView
         scaleGestureDetector = new ScaleGestureDetector(context, new ScaleListener());
     }
 
-    public Renderer getRenderer(){
+    public MyGLRenderer getRenderer(){
         return mRenderer;
     }
 
@@ -99,6 +103,7 @@ public class MyGLSurfaceView extends GLSurfaceView
                     pointerID.add(event.getPointerId(event.getActionIndex()));
                     mPreviousPointerPos.set(actualX, actualY);
                     mRenderer.getVirtualTrackball().pointerDown(actualX, actualY);
+                    mRenderer.getAxisTrackball().press();
                     break;
                 case MotionEvent.ACTION_MOVE:
                     if (Global.getStateProgram() == Global.STATE_RENDER_POINTS) {
@@ -108,18 +113,18 @@ public class MyGLSurfaceView extends GLSurfaceView
                             mRenderer.getVirtualTrackball().pointerMove(actualX, actualY);
                         else
                             mRenderer.getCamera().rotate(-dy, -dx, 0);
-                        mRenderer.refreshMVP();
-                        requestRender();
                         mPreviousPointerPos.set(actualX, actualY);
                     }
                     break;
                 case MotionEvent.ACTION_UP:
                     pointerID.clear();
                     mRenderer.getVirtualTrackball().pointerUp();
-                    break;
+                    mRenderer.getAxisTrackball().unPress();
             }
         } else
             gestures.detectGestures(event);
+        mRenderer.refreshMVP();
+        requestRender();
         return true;
     }
 
@@ -133,9 +138,18 @@ public class MyGLSurfaceView extends GLSurfaceView
      */
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
-        if( preference.getKey().equals(getResources().getString(R.string.key_mov_speed)) ) {
+        if ( preference.getKey().equals(getResources().getString(R.string.key_mov_speed)) ) {
             //Log.d(TAG,"MovementSpeed changed: "+newValue);
             speedMultiTouch = calculateSpeedMultiTouch((int)newValue);
+        } else if ( preference.getKey().equals(getContext().getString(R.string.key_show_axis_trackball)) ) {
+            if ((boolean)newValue)
+                mRenderer.getAxisTrackball().enable();
+            else
+                mRenderer.getAxisTrackball().disable();
+            Activity activity = (Activity) Global.getContext();
+            ((DrawerLayout) activity.findViewById(R.id.drawerLayout)).
+                    closeDrawer(activity.findViewById(R.id.linear_layout_drawerLayout));
+            requestRender();
         }
         return true;
     }
@@ -248,8 +262,8 @@ public class MyGLSurfaceView extends GLSurfaceView
                             oldDistancePointers = actualDistancePointers;
                             previousPointerPos[POS_POINTER_2].set(actualSecondX, actualSecondY);
                             mPreviousPointerPos.set(actualFirstX, actualFirstY);
-                            mRenderer.refreshMVP();
-                            requestRender();
+                            //mRenderer.refreshMVP();
+                            //requestRender();
                             ret = true;
                         }
                     }
@@ -286,7 +300,6 @@ public class MyGLSurfaceView extends GLSurfaceView
                     }
                     pointerID.remove(indexList);
                     ret = true;
-                    break;
             }
             return ret;
         }

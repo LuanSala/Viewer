@@ -1,10 +1,13 @@
 package lsa.viewercloudpoints.navigation_drawer;
 
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.SwitchPreference;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.View;
 
 import lsa.viewercloudpoints.Global;
@@ -15,10 +18,7 @@ import lsa.viewercloudpoints.R;
  */
 public class NavigationDrawerFragment extends PreferenceFragment
         implements Preference.OnPreferenceChangeListener, Preference.OnPreferenceClickListener {
-    private static final String TAG = "NavigationDrawerFragment";
-
-    private Preference centerCloud;
-    private ListPreference modeVision;
+    private static final String TAG = "NavigationDrawerFrag";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -30,8 +30,10 @@ public class NavigationDrawerFragment extends PreferenceFragment
         modeVision.setOnPreferenceChangeListener(this);
         findPreference(getString(R.string.key_full_screen)).setOnPreferenceChangeListener(this);
 
-        centerCloud = findPreference(getString(R.string.key_center_trackball));
+        centerCloud = findPreference(getString(R.string.key_centralize_trackball));
         centerCloud.setOnPreferenceClickListener(this);
+
+        showAxisTrackball = (SwitchPreference)findPreference(getString(R.string.key_show_axis_trackball));
     }
 
     @Override
@@ -40,9 +42,11 @@ public class NavigationDrawerFragment extends PreferenceFragment
             synchronized (this) {
                 if (newValue.equals(getString(R.string.value_mode_virtual_trackball))) {
                     centerCloud.setEnabled(true);
+                    showAxisTrackball.setEnabled(true);
                     Global.setViewingStyle(Global.VIEW_USING_TRACKBALL);
                 } else {
                     centerCloud.setEnabled(false);
+                    showAxisTrackball.setEnabled(false);
                     Global.setViewingStyle(Global.VIEW_USING_CAMERA);
                 }
                 notifyAll();
@@ -66,7 +70,7 @@ public class NavigationDrawerFragment extends PreferenceFragment
 
     @Override
     public boolean onPreferenceClick(Preference preference) {
-        if (preference.getKey().equals(getString(R.string.key_center_trackball))) {
+        if (preference.getKey().equals(getString(R.string.key_centralize_trackball))) {
             synchronized (this) {
                 Global.centralizeTrackball();
                 notifyAll();
@@ -83,12 +87,13 @@ public class NavigationDrawerFragment extends PreferenceFragment
         synchronized (this) {
             if (modeVision.getValue().equals(getString(R.string.value_mode_virtual_trackball))) {
                 centerCloud.setEnabled(true);
+                showAxisTrackball.setEnabled(true);
                 Global.setViewingStyle(Global.VIEW_USING_TRACKBALL);
             } else {
                 centerCloud.setEnabled(false);
+                showAxisTrackball.setEnabled(false);
                 Global.setViewingStyle(Global.VIEW_USING_CAMERA);
             }
-            //Global.useTrackballCentered( centerCloud.isChecked() );
             notifyAll();
         }
     }
@@ -100,4 +105,9 @@ public class NavigationDrawerFragment extends PreferenceFragment
             notifyAll();
         }
     }
+
+    private Preference centerCloud;
+    private ListPreference modeVision;
+    private SwitchPreference showAxisTrackball;
+
 }

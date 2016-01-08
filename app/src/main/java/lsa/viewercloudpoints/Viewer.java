@@ -1,28 +1,19 @@
 package lsa.viewercloudpoints;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.preference.SwitchPreference;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import lsa.viewercloudpoints.filechooser.FileChooser;
 import lsa.viewercloudpoints.navigation_drawer.MovementSpeedPreference;
 
-public class Viewer extends Activity
-    implements DialogInterface.OnClickListener {
+public class Viewer extends Activity {
     private static final String TAG = "Viewer";
-
-    private MyGLSurfaceView mGLView;
-    private Global global;
-
-    // Variavel da navigation drawer
-    DrawerLayout drawerLayout;
 
     /** Called when the activity is first created. */
     @Override
@@ -41,19 +32,32 @@ public class Viewer extends Activity
         }
         global = new Global(mGLView,this);
         drawerLayout = (DrawerLayout)findViewById(R.id.drawerLayout);
-        drawerLayout.addView(mGLView,0);  //Não remover esta linha...
+        drawerLayout.addView(mGLView, 0);  //Não remover esta linha...
 
-        ((PreferenceFragment)getFragmentManager().findFragmentByTag(getString(R.string.nav_drawer_TAG))).
-                findPreference(getString(R.string.key_mov_speed)).
+        drawerLayout.setOnFocusChangeListener(
+                new View.OnFocusChangeListener() {
+                    @Override
+                    public void onFocusChange(View v, boolean hasFocus) {
+                        if(mGLView.getRenderer().getAxisTrackball()!=null && hasFocus) {
+                            mGLView.getRenderer().getAxisTrackball().unPress();
+                            mGLView.requestRender();
+                        }
+                    }
+                }
+        );
+
+        PreferenceFragment preferenceFragment;
+        preferenceFragment = (PreferenceFragment)getFragmentManager().findFragmentByTag(getString(R.string.tag_nav_drawer_fragment));
+        switchFullscreen = (SwitchPreference)preferenceFragment.findPreference(getString(R.string.key_full_screen));
+
+        preferenceFragment.findPreference(getString(R.string.key_mov_speed)).
+                setOnPreferenceChangeListener(mGLView);
+        preferenceFragment.findPreference(getString(R.string.key_show_axis_trackball)).
                 setOnPreferenceChangeListener(mGLView);
         mGLView.setSpeedMultiTouchInitial(
-                ((MovementSpeedPreference)((PreferenceFragment)getFragmentManager().
-                        findFragmentByTag(getString(R.string.nav_drawer_TAG))).
-                        findPreference(getString(R.string.key_mov_speed))).getValue() );
-
-        //Point p = new Point();
-        //getWindowManager().getDefaultDisplay().getSize(p);
-        //System.out.println("Size = "+p.x+" "+p.y);
+                ((MovementSpeedPreference)preferenceFragment.
+                findPreference(getString(R.string.key_mov_speed))).getValue()
+        );
 
         findViewById(R.id.Button_exit_application).setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -70,9 +74,6 @@ public class Viewer extends Activity
             }
         });
 
-        PreferenceFragment preferenceFragment;
-        preferenceFragment = (PreferenceFragment)getFragmentManager().findFragmentByTag(getString(R.string.nav_drawer_TAG));
-        switchFullscreen = (SwitchPreference)preferenceFragment.findPreference(getString(R.string.key_full_screen));
     }
 
     public void openFileChooser(View view){
@@ -96,7 +97,7 @@ public class Viewer extends Activity
         if( requestCode==Global.PICK_FILE ){
             if( resultCode==RESULT_OK ){
                 Global.file = data.getStringExtra("fileSelected");
-                ((MyGLRenderer)mGLView.getRenderer()).updatePoints();
+                mGLView.getRenderer().updatePoints();
                 mGLView.requestRender();
                 drawerLayout.closeDrawer(findViewById(R.id.linear_layout_drawerLayout));
             }
@@ -111,32 +112,25 @@ public class Viewer extends Activity
             super.onBackPressed();
     }
 
-    public void onClick(DialogInterface dialog, int which) {
-        if(which==DialogInterface.BUTTON_POSITIVE)
-            super.onBackPressed();
-    }
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putFloatArray( getString(R.string.key_save_virtual_trackball),
-                ((MyGLRenderer)mGLView.getRenderer()).getVirtualTrackball().getForSaveInstanceState() );
-        outState.putFloatArray( getString(R.string.key_save_camera),
-                ((MyGLRenderer)mGLView.getRenderer()).getCamera().getForSaveInstanceState() );
+        outState.putFloatArray(getString(R.string.key_save_virtual_trackball),
+                mGLView.getRenderer().getVirtualTrackball().getForSaveInstanceState());
+        outState.putFloatArray(getString(R.string.key_save_camera),
+                mGLView.getRenderer().getCamera().getForSaveInstanceState());
     }
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if(hasFocus)
-            if(switchFullscreen.isChecked())
+            if (switchFullscreen.isChecked())
                 getWindow().getDecorView().setSystemUiVisibility(
                         View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
                                 View.SYSTEM_UI_FLAG_FULLSCREEN |
-                                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY );
+                                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
     }
-
-    //@TODO: configurar apropriadamente os métodos de saida do aplicativo nas classes corretas.
 
     @Override
     protected void onDestroy() {
@@ -144,8 +138,15 @@ public class Viewer extends Activity
         if(global!=null) global.destroy();
     }
 
+    private MyGLSurfaceView mGLView;
+    private Global global;
+
+    // Variavel da navigation drawer
+    private DrawerLayout drawerLayout;
+
     //Variável utilizada para chegar quando o modo FullScreen está ativado ou não.
-    SwitchPreference switchFullscreen;
+    private SwitchPreference switchFullscreen;
+
 }
 
 

@@ -7,45 +7,35 @@ package lsa.viewercloudpoints;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import android.app.Activity;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.os.Bundle;
+import android.preference.PreferenceFragment;
+import android.preference.SwitchPreference;
 
 public class MyGLRenderer implements GLSurfaceView.Renderer {
     private static final String TAG = "MyGLRenderer";
 
-    private float[] tempMatrix              = new float[16];
-    private final float[] mMVPMatrix        = new float[16];
-    private final float[] mProjectionMatrix = new float[16];
-    private VirtualTrackball virtualTrackball;
-    private Camera camera;
-    private Background background;
-
-    private VectorFloat centerTrackball;
-    private Points mPoints;
-    private boolean updatePoints;
-    private boolean MVPModified;
-
-    private static final short COLOR_BUFFER             = 0;
-    private static final short DEPTH_BUFFER             = 1;
-    private static final short NUM_RENDERBUFFER         = 2;
-    private static final short defaultFrameBufferWidth  = 256;
-    private static final short defaultFrameBufferHeight = 256;
-
-    private int frameBuffer[]  = new int[1];
-    private int renderBuffer[] = new int[NUM_RENDERBUFFER];
-
     //public TexOpenFile fileButton;
 
     public MyGLRenderer() {
-        mTranslucentBackground = true;
         MVPModified = true;
+        PreferenceFragment preferenceFragment;
+        preferenceFragment = (PreferenceFragment)((Activity)Global.getContext()).getFragmentManager().
+                findFragmentById(R.id.id_nav_drawer_fragment);
+        switchShowAxisTrackball = (SwitchPreference)preferenceFragment.findPreference(
+                Global.getContext().getString(R.string.key_show_axis_trackball));
     }
 
     public MyGLRenderer(Bundle savedInstanceState) {
-        mTranslucentBackground = true;
         MVPModified = true;
+        PreferenceFragment preferenceFragment;
+        preferenceFragment = (PreferenceFragment)((Activity)Global.getContext()).getFragmentManager().
+                findFragmentById(R.id.id_nav_drawer_fragment);
+        switchShowAxisTrackball = (SwitchPreference)preferenceFragment.findPreference(
+                Global.getContext().getString(R.string.key_show_axis_trackball));
 
         float[] floatArray = savedInstanceState.getFloatArray(Global.getContext().getString(R.string.key_save_virtual_trackball));
         virtualTrackball = new VirtualTrackball(floatArray);
@@ -59,6 +49,10 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
     public VirtualTrackball getVirtualTrackball() {
         return virtualTrackball;
+    }
+
+    public AxisTrackball getAxisTrackball(){
+        return axisTrackball;
     }
 
     public void refreshMVP(){
@@ -84,35 +78,32 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
                 break;
             case Global.STATE_RENDER_POINTS:
                 background.draw();
-                if(mPoints.isEnabled()) {
-                    if (MVPModified) {
-                        if (Global.getViewingStyle() == Global.VIEW_USING_TRACKBALL) {
-                            if (Global.requestedCentralizeTrackball()) {
-                                synchronized (mPoints.getMediumPointThread()) {
-                                    if (!mPoints.mediumPointCalculated())
-                                        try {
-                                            mPoints.getMediumPointThread().wait();
-                                        } catch (InterruptedException e) {
-                                            e.printStackTrace();
-                                        }
-                                }
-                                //Matrix.translateM(tempMatrix, 0, virtualTrackball.getMatrix(), 0,
-                                        //-mPoints.getMediumPoint().getX(),
-                                        //-mPoints.getMediumPoint().getY(),
-                                        //-mPoints.getMediumPoint().getZ());
-                                virtualTrackball.setCenter(mPoints.getMediumPoint(), mPoints.getZoomNeeded());
-                                System.arraycopy(virtualTrackball.getMatrix(), 0, tempMatrix, 0, 16);
-                            } else
-                                System.arraycopy(virtualTrackball.getMatrix(), 0, tempMatrix, 0, 16);
-                            Matrix.multiplyMM(mMVPMatrix, 0,
-                                    mProjectionMatrix, 0, tempMatrix, 0);
-                        } else
-                            Matrix.multiplyMM(mMVPMatrix, 0,
-                                    mProjectionMatrix, 0, camera.getViewMatrix(), 0);
-                    }
+                if (MVPModified) {
+                    if (Global.getViewingStyle() == Global.VIEW_USING_TRACKBALL) {
+                        if (Global.requestedCentralizeTrackball()) {
+                            synchronized (mPoints.getMediumPointThread()) {
+                                if (!mPoints.mediumPointCalculated())
+                                    try {
+                                        mPoints.getMediumPointThread().wait();
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                            }
+                            virtualTrackball.setCenter(mPoints.getMediumPoint(), mPoints.getZoomNeeded());
+                        }
+                        System.arraycopy(virtualTrackball.getMatrix(), 0, tempMatrix, 0, 16);
+                        Matrix.multiplyMM(mMVPMatrix, 0,
+                                mProjectionMatrix, 0, tempMatrix, 0);
+                    } else
+                        Matrix.multiplyMM(mMVPMatrix, 0,
+                                mProjectionMatrix, 0, camera.getViewMatrix(), 0);
+                }
+                if (Global.getViewingStyle()==Global.VIEW_USING_TRACKBALL)
+                    if (axisTrackball.isEnabled())
+                        axisTrackball.draw(virtualTrackball.getMatrix());
+                if (mPoints.isEnabled()) {
                     mPoints.draw(MVPModified, mMVPMatrix);
                     MVPModified = false;
-                    break;
                 }
         }
     }
@@ -132,7 +123,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         //Matrix.setIdentityM( mProjectionMatrix,0 );
         Matrix.perspectiveM( mProjectionMatrix,0,60.0f,ratio,0.06f,20000.0f);
 
-        background.update(mProjectionMatrix);
+        background.updateProjectionMatrix(mProjectionMatrix);
+        axisTrackball.updateProjectionMatrix(mProjectionMatrix);
         virtualTrackball.updateWindowSize();
         //fileButton.setModelViewMatrix();
         MVPModified = true;
@@ -141,18 +133,21 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
         //Log.d(TAG,"SurfaceCreated");
         background = new Background();
+        axisTrackball = new AxisTrackball();
         if (virtualTrackball==null)
             virtualTrackball = new VirtualTrackball();
         if (camera==null) {
             camera = new Camera();
-            camera.move(5f,0);
+            camera.move(5f, 0);
             camera.moveZ(20f);
         }
         refreshMVP();
 
+        if (!switchShowAxisTrackball.isChecked())
+            axisTrackball.disable();
+
         //createFrameBuffer();
         GLES20.glClearColor(0f, 0f, 0f, 1f);
-        //GLES20.glClearColor(0.0f, 0.0f, 0.5f, 1.0f);
 
         GLES20.glDisable(GLES20.GL_DITHER);
         //GLES20.glDisable(GLES20.GL_SCISSOR_TEST);
@@ -197,6 +192,27 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER,0);
     }
 
+    private float[] tempMatrix              = new float[16];
+    private final float[] mMVPMatrix        = new float[16];
+    private final float[] mProjectionMatrix = new float[16];
+    private VirtualTrackball virtualTrackball;
+    private Camera camera;
+    private Background background;
+    private AxisTrackball axisTrackball;
 
-    private boolean mTranslucentBackground;
+    private Points mPoints;
+    private boolean updatePoints;
+    private boolean MVPModified;
+
+    private static final short COLOR_BUFFER             = 0;
+    private static final short DEPTH_BUFFER             = 1;
+    private static final short NUM_RENDERBUFFER         = 2;
+    private static final short defaultFrameBufferWidth  = 256;
+    private static final short defaultFrameBufferHeight = 256;
+
+    private int frameBuffer[]  = new int[1];
+    private int renderBuffer[] = new int[NUM_RENDERBUFFER];
+
+    private SwitchPreference switchShowAxisTrackball;
+
 }
