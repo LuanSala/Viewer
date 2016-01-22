@@ -1,24 +1,17 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:statusBarColor">@android:color/holo_blue_dark</item>
+        <item name="android:colorEdgeEffect">@android:color/darker_gray</item>
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="ViewerTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="ViewerTheme" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:colorEdgeEffect">#dddddd</item>
         <item name="android:windowTranslucentNavigation">false</item>
         <item name="android:windowTranslucentStatus">true</item>
-
-        <!--<item name="android:windowNoTitle">true</item>
-        <item name="windowActionBar">false</item>
-        <item name="android:windowActionModeOverlay">true</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:windowContentTransitions">true</item>
-        <item name="android:windowAllowEnterTransitionOverlap">true</item>
-        <item name="android:windowAllowReturnTransitionOverlap">true</item>
-        <item name="android:windowSharedElementEnterTransition">@android:transition/move</item>
-        <item name="android:windowSharedElementExitTransition">@android:transition/move</item>-->
+        <item name="android:hardwareAccelerated">true</item>
     </style>
 
 </resources>

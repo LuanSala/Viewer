@@ -1,28 +1,97 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:background="@color/background_material_dark">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:ignore="contentDescription"
+    android:paddingBottom="20dp"
+    android:background="@color/material_blue_grey_900">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_mainScreen"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@android:color/holo_blue_light"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:titleTextColor="@android:color/primary_text_dark"
+        android:layout_marginBottom="20dp" />
 
     <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:gravity="center_vertical|center_horizontal">
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="33"
+        android:layout_gravity="center"
+        android:gravity="center">
 
-        <Button
+        <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/new_file"
-            android:id="@+id/button"
-            android:drawableLeft="@drawable/ic_storage_black_24dp"
-            android:textColor="@color/abc_primary_text_material_dark"
-            android:textAllCaps="false"
-            android:textIsSelectable="false"
+            android:id="@+id/imageButton2"
+            android:src="@drawable/ic_storage_black_48dp"
+            android:padding="14dp"
+            android:onClick="openFileChooser"
+            android:tint="@android:color/black" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:layout_centerInParent="true"
-            android:textStyle="italic"
+            android:text="Abrir"
+            android:id="@+id/textView6"
+            android:textColor="@android:color/primary_text_dark"
             android:onClick="openFileChooser" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="33"
+        android:layout_gravity="center"
+        android:gravity="center">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageButton3"
+            android:src="@drawable/ic_bluetooth_black_48dp"
+            android:padding="14dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Bluetooth"
+            android:id="@+id/textView4"
+            android:textColor="@android:color/primary_text_dark" />
 
     </LinearLayout>
 
-</RelativeLayout>
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="33"
+        android:layout_gravity="center"
+        android:gravity="center">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageButton4"
+            android:padding="14dp"
+            android:src="@drawable/ic_help_black_48dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Ajuda"
+            android:id="@+id/textView5"
+            android:textColor="@android:color/primary_text_dark" />
+    </LinearLayout>
+
+</LinearLayout>

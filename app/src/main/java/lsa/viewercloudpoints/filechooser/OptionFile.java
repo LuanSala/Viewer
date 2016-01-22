@@ -33,8 +33,8 @@ public class OptionFile implements Comparable<OptionFile> {
     }
 
     @Override
-    public int compareTo(OptionFile o) {
-        return this.nameFile.toLowerCase().compareTo( o.getName().toLowerCase() );
+    public int compareTo(OptionFile another) {
+        return this.nameFile.toLowerCase().compareTo( another.getName().toLowerCase() );
     }
 
     @Override

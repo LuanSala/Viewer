@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:paddingStart="10dp"
+    android:paddingEnd="0dp"
+    android:background="?android:attr/selectableItemBackground">
+
+    <ImageView
+        android:id="@+id/iconFile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="8dp"
+        android:contentDescription="TEST"
+        android:src="@android:drawable/ic_menu_help"/>
+
+    <TextView
+        android:id="@+id/first_line"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/iconFile"
+        android:layout_alignParentTop="true"
+        android:paddingTop="10dp"
+        android:textSize="20sp"
+        android:textColor="?android:attr/textColorPrimary" />
+
+    <TextView
+        android:id="@+id/second_line"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/iconFile"
+        android:layout_below="@id/first_line"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp"
+        android:gravity="center_vertical"
+        android:textSize="12sp"
+        android:textColor="?android:attr/textColorSecondary" />
+
+</RelativeLayout>

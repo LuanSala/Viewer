@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent" >
 
     <!--<SurfaceView
         android:layout_width="match_parent"
@@ -22,16 +22,16 @@
         android:layout_width="280dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:id="@+id/linear_layout_drawerLayout"
-        android:background="@color/background_material_light">
+        android:id="@+id/layout_nav_drawer"
+        android:background="@color/background_material_light"
+        android:paddingTop="24dp">
 
         <fragment android:name="lsa.viewercloudpoints.navigation_drawer.NavigationDrawerFragment"
             android:id="@+id/id_nav_drawer_fragment"
             android:tag="@string/tag_nav_drawer_fragment"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_above="@+id/layout_buttons_in_bottom_nav_drawer"
-            android:layout_marginTop="16dp"/>
+            android:layout_above="@+id/layout_buttons_in_bottom_nav_drawer" />
 
         <LinearLayout
             android:id="@+id/layout_buttons_in_bottom_nav_drawer"
@@ -39,7 +39,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_gravity="bottom"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            style="?android:attr/buttonBarStyle">
 
             <Button
                 android:id="@+id/Button_exit_application"
@@ -51,7 +52,8 @@
                 android:textSize="12sp"
                 android:drawableTop="@drawable/ic_exit_to_app_black_24dp"
                 android:textIsSelectable="false"
-                android:onClick="exitApplication"/>
+                android:onClick="exitApplication"
+                style="?android:attr/buttonBarButtonStyle"/>
 
             <Button
                 android:id="@+id/Button_open_file_nav_drawer"
@@ -63,7 +65,8 @@
                 android:textSize="12sp"
                 android:drawableTop="@drawable/ic_storage_black_24dp"
                 android:textIsSelectable="false"
-                android:onClick="openFileChooser"/>
+                android:onClick="openFileChooser"
+                style="?android:attr/buttonBarButtonStyle"/>
 
         </LinearLayout>
 

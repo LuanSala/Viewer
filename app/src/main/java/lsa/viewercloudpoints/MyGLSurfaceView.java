@@ -5,16 +5,14 @@ package lsa.viewercloudpoints;
  */
 
 import android.app.Activity;
-import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.content.Context;
 import android.os.Bundle;
 import android.preference.Preference;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
+import android.view.View;
 
 import java.util.ArrayList;
 
@@ -38,10 +36,8 @@ public class MyGLSurfaceView extends GLSurfaceView
         setEGLContextClientVersion( 2 );
 
         mRenderer = new MyGLRenderer();
-        setRenderer(mRenderer);
-        setRenderMode(RENDERMODE_WHEN_DIRTY);
         gestures = new DetectMultiTouch();
-        scaleGestureDetector = new ScaleGestureDetector(context, new ScaleListener());
+        init(context,mRenderer);
     }
 
     public MyGLSurfaceView(Context context, Bundle savedInstanceState){
@@ -52,10 +48,17 @@ public class MyGLSurfaceView extends GLSurfaceView
         setEGLContextClientVersion( 2 );
 
         mRenderer = new MyGLRenderer(savedInstanceState);
-        setRenderer(mRenderer);
-        setRenderMode(RENDERMODE_WHEN_DIRTY);
         gestures = new DetectMultiTouch();
+        init(context,mRenderer);
+    }
+
+    private void init(Context context, GLSurfaceView.Renderer renderer){
+        setRenderer(renderer);
+        setRenderMode(RENDERMODE_WHEN_DIRTY);
         scaleGestureDetector = new ScaleGestureDetector(context, new ScaleListener());
+
+        drawerLayout = (DrawerLayout)((Activity)context).findViewById(R.id.drawerLayout);
+        layoutNavigationDrawer = ((Activity)context).findViewById(R.id.layout_nav_drawer);
     }
 
     public MyGLRenderer getRenderer(){
@@ -146,9 +149,7 @@ public class MyGLSurfaceView extends GLSurfaceView
                 mRenderer.getAxisTrackball().enable();
             else
                 mRenderer.getAxisTrackball().disable();
-            Activity activity = (Activity) Global.getContext();
-            ((DrawerLayout) activity.findViewById(R.id.drawerLayout)).
-                    closeDrawer(activity.findViewById(R.id.linear_layout_drawerLayout));
+            drawerLayout.closeDrawer(layoutNavigationDrawer);
             requestRender();
         }
         return true;
@@ -262,8 +263,6 @@ public class MyGLSurfaceView extends GLSurfaceView
                             oldDistancePointers = actualDistancePointers;
                             previousPointerPos[POS_POINTER_2].set(actualSecondX, actualSecondY);
                             mPreviousPointerPos.set(actualFirstX, actualFirstY);
-                            //mRenderer.refreshMVP();
-                            //requestRender();
                             ret = true;
                         }
                     }
@@ -374,9 +373,11 @@ public class MyGLSurfaceView extends GLSurfaceView
             return ret;
         }
 
-
     }// end class DetectMultiTouch
 
+
+    private DrawerLayout drawerLayout;
+    private View layoutNavigationDrawer;
 
     private ScaleGestureDetector scaleGestureDetector;
 

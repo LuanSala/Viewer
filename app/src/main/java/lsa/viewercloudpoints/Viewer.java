@@ -38,13 +38,14 @@ public class Viewer extends Activity {
                 new View.OnFocusChangeListener() {
                     @Override
                     public void onFocusChange(View v, boolean hasFocus) {
-                        if(mGLView.getRenderer().getAxisTrackball()!=null && hasFocus) {
+                        if (mGLView.getRenderer().getAxisTrackball() != null && hasFocus) {
                             mGLView.getRenderer().getAxisTrackball().unPress();
                             mGLView.requestRender();
                         }
                     }
                 }
         );
+        layoutNavigationDrawer = findViewById(R.id.layout_nav_drawer);
 
         PreferenceFragment preferenceFragment;
         preferenceFragment = (PreferenceFragment)getFragmentManager().findFragmentByTag(getString(R.string.tag_nav_drawer_fragment));
@@ -77,7 +78,7 @@ public class Viewer extends Activity {
     }
 
     public void openFileChooser(View view){
-        drawerLayout.closeDrawer(findViewById(R.id.linear_layout_drawerLayout));
+        drawerLayout.closeDrawer(layoutNavigationDrawer );
         Intent render = new Intent(this,FileChooser.class);
         boolean[] bool = {true};
         render.putExtra(getString(R.string.isActivityForResult), bool);
@@ -99,15 +100,15 @@ public class Viewer extends Activity {
                 Global.file = data.getStringExtra("fileSelected");
                 mGLView.getRenderer().updatePoints();
                 mGLView.requestRender();
-                drawerLayout.closeDrawer(findViewById(R.id.linear_layout_drawerLayout));
+                drawerLayout.closeDrawer(layoutNavigationDrawer);
             }
         }
     }
 
     @Override
     public void onBackPressed() {
-        if( drawerLayout.isDrawerOpen(findViewById(R.id.linear_layout_drawerLayout)) )
-            drawerLayout.closeDrawer(findViewById(R.id.linear_layout_drawerLayout));
+        if( drawerLayout.isDrawerOpen(layoutNavigationDrawer) )
+            drawerLayout.closeDrawer(layoutNavigationDrawer);
         else
             super.onBackPressed();
     }
@@ -143,6 +144,7 @@ public class Viewer extends Activity {
 
     // Variavel da navigation drawer
     private DrawerLayout drawerLayout;
+    private View layoutNavigationDrawer;
 
     //Variável utilizada para chegar quando o modo FullScreen está ativado ou não.
     private SwitchPreference switchFullscreen;

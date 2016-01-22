@@ -9,6 +9,7 @@ import android.preference.SwitchPreference;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.View;
+import android.widget.RelativeLayout;
 
 import lsa.viewercloudpoints.Global;
 import lsa.viewercloudpoints.R;
@@ -51,8 +52,7 @@ public class NavigationDrawerFragment extends PreferenceFragment
                 }
                 notifyAll();
             }
-            ((DrawerLayout) getActivity().findViewById(R.id.drawerLayout)).closeDrawer(
-                    getActivity().findViewById(R.id.linear_layout_drawerLayout));
+            ((DrawerLayout) getActivity().findViewById(R.id.drawerLayout)).closeDrawer(layoutParent);
         } else if( preference.getKey().equals(getString(R.string.key_full_screen)) ) {
             if(newValue.equals(true)) {
                 //getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -60,9 +60,11 @@ public class NavigationDrawerFragment extends PreferenceFragment
                         View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
                                 View.SYSTEM_UI_FLAG_FULLSCREEN |
                                 View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY );
+                layoutParent.setPadding(0,0,0,0);
             } else {
                 //getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+                layoutParent.setPadding(0,72,0,0);
             }
         }
         return true;
@@ -75,8 +77,7 @@ public class NavigationDrawerFragment extends PreferenceFragment
                 Global.centralizeTrackball();
                 notifyAll();
             }
-            ((DrawerLayout) getActivity().findViewById(R.id.drawerLayout)).closeDrawer(
-                    getActivity().findViewById(R.id.linear_layout_drawerLayout));
+            ((DrawerLayout) getActivity().findViewById(R.id.drawerLayout)).closeDrawer(layoutParent);
         }
         return true;
     }
@@ -96,6 +97,7 @@ public class NavigationDrawerFragment extends PreferenceFragment
             }
             notifyAll();
         }
+        layoutParent = getActivity().findViewById(R.id.layout_nav_drawer);
     }
 
     @Override
@@ -109,5 +111,7 @@ public class NavigationDrawerFragment extends PreferenceFragment
     private Preference centerCloud;
     private ListPreference modeVision;
     private SwitchPreference showAxisTrackball;
+
+    private View layoutParent;
 
 }
