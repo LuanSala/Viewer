@@ -15,6 +15,9 @@ import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.preference.SwitchPreference;
 
+import lsa.viewercloudpoints.modeVision.Camera;
+import lsa.viewercloudpoints.modeVision.VirtualTrackball;
+
 public class MyGLRenderer implements GLSurfaceView.Renderer {
     private static final String TAG = "MyGLRenderer";
 

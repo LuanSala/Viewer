@@ -1,7 +1,11 @@
-package lsa.viewercloudpoints;
+package lsa.viewercloudpoints.modeVision;
 
 
 import android.opengl.Matrix;
+
+import lsa.viewercloudpoints.Global;
+import lsa.viewercloudpoints.math.Quaternion;
+import lsa.viewercloudpoints.math.VectorFloat;
 
 /**
  * Created by Luan Sala on 28/07/2015.

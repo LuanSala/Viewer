@@ -7,14 +7,13 @@ package lsa.viewercloudpoints;
 import android.opengl.GLES20;
 import android.util.Log;
 
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
+
+import lsa.viewercloudpoints.math.VectorFloat;
 
 public class Points {
     private static final String TAG = "Points";
@@ -72,7 +71,7 @@ public class Points {
         int vertexShader = ShaderHelper.loadShader(GLES20.GL_VERTEX_SHADER,vertexShaderCode);
         int fragmentShader = ShaderHelper.loadShader(GLES20.GL_FRAGMENT_SHADER,fragmentShaderCode);
 
-        mProgram = ShaderHelper.createAndLinkProgram(vertexShader,fragmentShader);
+        mProgram = ShaderHelper.createAndLinkProgram(vertexShader, fragmentShader);
 
         mPosition = GLES20.glGetAttribLocation(mProgram, "vPosition");
         mColor    = GLES20.glGetAttribLocation(mProgram, "vColor");
@@ -115,73 +114,6 @@ public class Points {
     public void disable(){
         isEnabled = false;
     }
-
-    /** Funcao temporaria... Somente para testes */
-    /* Há erros na hora de se converter o valor lido de um arquivo de texto para
-       um valor de ponto flutuante. (erro de precisao) */
-    /*private void initSomePoints(){
-        String fileName = "points_referencia.txt";
-        //String fileName = "points.b";
-        File file;
-
-        if( Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) ) {
-            String baseDir = Environment.getExternalStorageDirectory().getAbsolutePath();
-            file = new File(baseDir + File.separator + fileName);
-            if( file.isFile() ){
-                try {
-                    FileReader fileR = new FileReader(file);
-                    BufferedReader bufferR = new BufferedReader(fileR);
-
-                    Vector<Float> listVertex = new Vector<>();
-                    Vector<Float> listColor = new Vector<>();
-                    while( bufferR.ready() ){
-                        String temp = bufferR.readLine();
-                        String[] temp2 = temp.split(" ");
-
-                        float x = Float.valueOf(temp2[0]);
-                        float y = Float.valueOf(temp2[1]);
-                        float z = Float.valueOf(temp2[2]);
-                        short r = Short.valueOf(temp2[3]);
-                        short g = Short.valueOf(temp2[4]);
-                        short b = Short.valueOf(temp2[5]);
-
-                        listVertex.addElement( x );
-                        listVertex.addElement( y );
-                        listVertex.addElement( z );
-                        listColor.addElement( r/255.0f );
-                        listColor.addElement( g/255.0f );
-                        listColor.addElement( b/255.0f );
-                    }
-
-                    int totalVertices = listVertex.size();
-                    totalPoints = totalVertices/3;
-                    float vertex[] = new float[totalVertices];
-                    float color[] = new float[totalVertices];
-
-                    for(int i=0 ; i<totalVertices; i+=3){
-                        vertex[i]=listVertex.get(i);  vertex[i+1]=listVertex.get(i+1);  vertex[i+2]=listVertex.get(i+2);
-                        color[i] =listColor.get(i);   color[i+1] =listColor.get(i+1);   color[i+2] =listColor.get(i+2);
-                    }
-
-                    ByteBuffer vv = ByteBuffer.allocateDirect(vertex.length * 4);
-                    vv.order(ByteOrder.nativeOrder());
-                    vertexBuffer = vv.asFloatBuffer();
-                    //vertexBuffer = FloatBuffer.allocate(asdf.length * 4);
-                    vertexBuffer.put(vertex);
-
-                    ByteBuffer cc = ByteBuffer.allocateDirect(color.length * 4);
-                    cc.order(ByteOrder.nativeOrder());
-                    colorBuffer = cc.asFloatBuffer();
-                    //colorBuffer = FloatBuffer.allocate(color.length * 4);
-                    colorBuffer.put(color);
-
-                    fileR.close();
-                }catch(IOException e){
-                    e.printStackTrace();
-                }
-            }
-        }
-    }*/
 
     public void update(){
         if(buffer!=null) {
@@ -374,10 +306,17 @@ public class Points {
             minPoint.setY(maxPoint.getY());
             minPoint.setZ(maxPoint.getZ());
 
-            if(mPointCloudWithColor)
-                cloudWithColor(maxPoint,minPoint);
-            else
-                cloudWithoutColor(maxPoint,minPoint);
+            // Esse try/catch aqui está pois uma vez o aplicativo deu crash sem explicação.
+            // Deu a exceção NullPointerException na 4ª linha do método cloudWithColor.
+            try{
+                if(mPointCloudWithColor)
+                    cloudWithColor(maxPoint,minPoint);
+                else
+                    cloudWithoutColor(maxPoint,minPoint);
+            }catch (NullPointerException e){
+                initSomePoints();
+                run();
+            }
 
             mediumPoint.setX( (maxPoint.getX() + minPoint.getX())*0.5f );
             mediumPoint.setY( (maxPoint.getY() + minPoint.getY())*0.5f );
@@ -409,7 +348,8 @@ public class Points {
             }
         }
 
-        private void cloudWithColor(VectorFloat maxPoint, VectorFloat minPoint){
+        private void cloudWithColor(VectorFloat maxPoint, VectorFloat minPoint)
+                throws NullPointerException {
             float x,y,z;
             for(int i=1; i<totalPoints; i++){
                 x = buffer.getFloat(i * 15);
@@ -425,7 +365,8 @@ public class Points {
             }
         }
 
-        private void cloudWithoutColor(VectorFloat maxPoint, VectorFloat minPoint){
+        private void cloudWithoutColor(VectorFloat maxPoint, VectorFloat minPoint)
+                throws NullPointerException {
             float x,y,z;
             for(int i=1; i<totalPoints; i++){
                 x = buffer.getFloat(i * 12);

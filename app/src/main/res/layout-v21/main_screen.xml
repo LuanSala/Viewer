@@ -15,7 +15,8 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         app:titleTextColor="@android:color/primary_text_dark"
-        android:layout_marginBottom="20dp" />
+        android:layout_marginBottom="20dp"
+        android:elevation="4dp" />
 
     <LinearLayout
         android:orientation="vertical"

@@ -1,4 +1,4 @@
-package lsa.viewercloudpoints;
+package lsa.viewercloudpoints.math;
 
 /**
  * Created by Luan Sala on 21/07/2015.

@@ -60,4 +60,8 @@
     <string name="positiveButton_dialog_open_file">Sim</string>
     <string name="negativeButton_dialog_open_file">Não</string>
 
+    <!-- Strings utilizadas no Viewer quando o drawer está aberto e fechado -->
+    <string name="drawer_viewer_opened">@string/app_name</string>
+    <string name="drawer_viewer_closed">@string/app_name</string>
+
 </resources>

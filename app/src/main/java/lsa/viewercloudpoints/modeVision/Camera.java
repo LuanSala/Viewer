@@ -1,6 +1,8 @@
-package lsa.viewercloudpoints;
+package lsa.viewercloudpoints.modeVision;
 
 import android.opengl.Matrix;
+
+import lsa.viewercloudpoints.math.Quaternion;
 
 /**
  * Created by Luan Sala on 24/07/2015.

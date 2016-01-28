@@ -16,6 +16,8 @@ import android.view.View;
 
 import java.util.ArrayList;
 
+import lsa.viewercloudpoints.math.VectorFloat;
+
 public class MyGLSurfaceView extends GLSurfaceView
     implements Preference.OnPreferenceChangeListener {
     private static final String TAG = "MyGLSurfaceView";

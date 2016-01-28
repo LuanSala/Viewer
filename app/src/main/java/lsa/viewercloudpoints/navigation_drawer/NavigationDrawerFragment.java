@@ -1,15 +1,15 @@
 package lsa.viewercloudpoints.navigation_drawer;
 
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.SwitchPreference;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.RelativeLayout;
 
 import lsa.viewercloudpoints.Global;
 import lsa.viewercloudpoints.R;
@@ -60,11 +60,13 @@ public class NavigationDrawerFragment extends PreferenceFragment
                         View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
                                 View.SYSTEM_UI_FLAG_FULLSCREEN |
                                 View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY );
-                layoutParent.setPadding(0,0,0,0);
+                layoutParent.setPadding(0, 0, 0, 0);
+                actionBar.hide();
             } else {
                 //getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
                 layoutParent.setPadding(0,72,0,0);
+                actionBar.show();
             }
         }
         return true;
@@ -98,6 +100,7 @@ public class NavigationDrawerFragment extends PreferenceFragment
             notifyAll();
         }
         layoutParent = getActivity().findViewById(R.id.layout_nav_drawer);
+        actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
     }
 
     @Override
@@ -111,6 +114,7 @@ public class NavigationDrawerFragment extends PreferenceFragment
     private Preference centerCloud;
     private ListPreference modeVision;
     private SwitchPreference showAxisTrackball;
+    private ActionBar actionBar;
 
     private View layoutParent;
 
