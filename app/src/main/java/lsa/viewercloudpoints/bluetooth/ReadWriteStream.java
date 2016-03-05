@@ -47,7 +47,7 @@ public class ReadWriteStream extends Thread {
         boolean    canReceiveFile = false;
         ByteBuffer byteBuffer = ByteBuffer.allocate(48);
         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
-        String     fileName;
+        String     fileName = "";
         int        sizeFileToReceiver = 0;
         int        bytesRead = 0;
         while(true) {
@@ -86,6 +86,10 @@ public class ReadWriteStream extends Thread {
                     bytesRead = mInputStream.read(readBuffer, 0, READ_BUFFER_LENGTH);
                     totalBytesReceived += bytesRead;
                     mSaverFile.write(readBuffer, bytesRead);
+                    if (requestedInitialInfo) {
+                        requestedInitialInfo = false;
+                        mHandler.obtainMessage(BluetoothScreen.MESSAGE_INIT_PROGRESS_BAR,sizeFileToReceiver,0,fileName).sendToTarget();
+                    }
                     mHandler.obtainMessage(BluetoothScreen.MESSAGE_UPDATE_PROGRESS_BAR, totalBytesReceived, 0).sendToTarget();
                     if (totalBytesReceived==sizeFileToReceiver) {
                         canReceiveFile = false;
@@ -106,6 +110,14 @@ public class ReadWriteStream extends Thread {
         } catch (IOException e) {}
     }
 
+    public void requestInitialInfo() {
+        requestedInitialInfo = true;
+    }
+
+    public void updateHandler(Handler handler) {
+        mHandler = handler;
+    }
+
     public void setOnSocketCloseListener(OnSocketCloseListener listener) {
         mOnSocketClosedListener = listener;
     }
@@ -116,11 +128,12 @@ public class ReadWriteStream extends Thread {
 
     private OnSocketCloseListener mOnSocketClosedListener;
 
-    private SaverFile mSaverFile;
+    private boolean requestedInitialInfo;
 
     private Runnable runnableSocketClose;
+    private SaverFile mSaverFile;
     private final BluetoothSocket mSocket;
     private final InputStream mInputStream;
     private final OutputStream mOutputStream;
-    private final Handler mHandler;
+    private Handler mHandler;
 }

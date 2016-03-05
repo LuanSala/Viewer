@@ -71,6 +71,10 @@ public class ConnectThread extends Thread {
         return mBluetoothDevice.getAddress();
     }
 
+    public BluetoothDevice getDeviceConnected() {
+        return mBluetoothDevice;
+    }
+
     public interface OnConnectDeviceListener {
         void onConnected(BluetoothDevice btDevice, BluetoothSocket serverSocket);
     }
