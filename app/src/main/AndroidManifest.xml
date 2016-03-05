@@ -4,7 +4,9 @@
 
     <uses-feature android:glEsVersion="0x00020000" android:required="true" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
     <application
         android:allowBackup="true"
@@ -25,6 +27,10 @@
 
         <activity android:name=".filechooser.FileChooser"
             android:label="Pick File" />
+
+        <activity android:name=".bluetooth.BluetoothScreen"
+            android:label="Receber nuvem"
+            android:screenOrientation="locked" />
 
     </application>
 

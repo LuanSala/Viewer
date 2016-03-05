@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import lsa.viewercloudpoints.bluetooth.BluetoothScreen;
 import lsa.viewercloudpoints.filechooser.FileChooser;
 
 
@@ -25,8 +26,13 @@ public class MainScreen extends AppCompatActivity {
     }
 
     public void openFileChooser(View view){
-        Intent render = new Intent(this,FileChooser.class);
-        startActivity(render);
+        Intent intent = new Intent(this,FileChooser.class);
+        startActivity(intent);
+    }
+
+    public void openBluetoothScreen(View view){
+        Intent intent = new Intent(this, BluetoothScreen.class);
+        startActivity(intent);
     }
 
     @Override

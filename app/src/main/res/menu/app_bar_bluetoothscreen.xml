@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_settings_bluetooth_btScreen"
+        android:icon="@drawable/ic_settings_bluetooth_white_24dp"
+        android:title="@string/setting_bluetooth"
+        app:showAsAction="always" />
+
+</menu>

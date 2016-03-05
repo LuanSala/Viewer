@@ -14,8 +14,7 @@
         android:background="@android:color/holo_blue_light"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:titleTextColor="@android:color/primary_text_dark"
-        android:layout_marginBottom="20dp" />
+        app:titleTextColor="@android:color/primary_text_dark" />
 
     <LinearLayout
         android:orientation="vertical"
@@ -55,17 +54,17 @@
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/imageButton3"
             android:src="@drawable/ic_bluetooth_black_48dp"
-            android:padding="14dp" />
+            android:padding="14dp"
+            android:onClick="openBluetoothScreen"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="Bluetooth"
-            android:id="@+id/textView4"
-            android:textColor="@android:color/primary_text_dark" />
+            android:textColor="@android:color/primary_text_dark"
+            android:onClick="openBluetoothScreen"/>
 
     </LinearLayout>
 
@@ -80,7 +79,6 @@
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/imageButton4"
             android:padding="14dp"
             android:src="@drawable/ic_help_black_48dp" />
 
@@ -89,7 +87,6 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="Ajuda"
-            android:id="@+id/textView5"
             android:textColor="@android:color/primary_text_dark" />
     </LinearLayout>
 

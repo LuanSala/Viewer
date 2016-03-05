@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -121,8 +122,23 @@ public class Viewer extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.app_bar_viewerscreen,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return (drawerToogle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item));
+        drawerToogle.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+            case R.id.action_home_viewerScreen:
+                Intent home = new Intent(this,MainScreen.class);
+                home.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(home);
+                finish();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

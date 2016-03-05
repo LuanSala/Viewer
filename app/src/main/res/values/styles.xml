@@ -11,5 +11,12 @@
         <item name="android:hardwareAccelerated">true</item>
     </style>
 
+    <style name="TextAppearance" parent="TextAppearance.AppCompat" />
+
+    <style name="TextAppearance.SwitchBar" parent="TextAppearance.AppCompat.Title"/>
+
+    <style name="SwitchBarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar" >
+        </style>
+
 </resources>
 

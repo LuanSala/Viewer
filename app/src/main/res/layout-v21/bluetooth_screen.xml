@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layout_bluetooth_screen"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/material_blue_grey_900">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_bluetoothScreen"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@android:color/holo_blue_light"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:titleTextColor="@android:color/primary_text_dark"
+        android:elevation="4dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@drawable/switchbar_bluetooth_screen_background"
+        android:onClick="switchBarOnClick" >
+
+        <include layout="@layout/switch_bar" />
+
+    </LinearLayout>
+
+    <ViewSwitcher
+        android:id="@+id/viewSwitcher_bluetoothScreen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:background="@android:color/white"
+            android:gravity="center|start"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textAlignment="textStart"
+            android:text="@string/description_bluetooth_screen"/>
+
+        <LinearLayout
+            android:id="@+id/linearLayout_bluetoothScreen"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:paddingBottom="6dp"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textStyle="bold"
+                android:textColor="@android:color/primary_text_dark"
+                android:text="@string/connected_device"
+                android:layout_gravity="start" />
+
+            <TextView
+                android:id="@+id/textView_connected_device_bluetoothScreen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dp"
+                android:paddingEnd="0dp"
+                android:paddingBottom="2dp"
+                android:lines="2"
+                android:textColor="@android:color/primary_text_dark"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="@string/bluetooth_off" />
+
+            <Button
+                android:id="@+id/button_connect"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:onClick="chooseDeviceForConnect"
+                android:text="@string/connect" />
+
+        </LinearLayout>
+
+    </ViewSwitcher>
+
+
+
+</LinearLayout>
