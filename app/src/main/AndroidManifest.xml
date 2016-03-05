@@ -32,6 +32,8 @@
             android:label="Receber nuvem"
             android:screenOrientation="locked" />
 
+        <service android:name=".bluetooth.BluetoothService" />
+
     </application>
 
 </manifest>
